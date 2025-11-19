@@ -11,7 +11,7 @@ using SafePETSc: MPIDENSE, MPIAIJ
 using LinearAlgebra
 using SparseArrays
 include(joinpath(@__DIR__, "mpi_test_harness.jl"))
-using .MPITestHarness
+using .MPITestHarness: QuietTestSet
 
 comm = MPI.COMM_WORLD
 rank = MPI.Comm_rank(comm)
@@ -23,7 +23,7 @@ if rank == 0
 end
 
 # Keep output tidy and aggregate at the end
-ts = @testset MPITestHarness.QuietTestSet "Helper functions tests" begin
+ts = @testset QuietTestSet "Helper functions tests" begin
 
 # Test 1: amgb_zeros with MPIAIJ
 if rank == 0

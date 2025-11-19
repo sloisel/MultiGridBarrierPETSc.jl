@@ -10,7 +10,7 @@ using SafePETSc
 using MultiGridBarrier
 using LinearAlgebra
 include(joinpath(@__DIR__, "mpi_test_harness.jl"))
-using .MPITestHarness
+using .MPITestHarness: QuietTestSet
 
 comm = MPI.COMM_WORLD
 rank = MPI.Comm_rank(comm)
@@ -25,7 +25,7 @@ if rank == 0
 end
 
 # Keep output tidy and aggregate at the end
-ts = @testset MPITestHarness.QuietTestSet "Quick integration tests" begin
+ts = @testset QuietTestSet "Quick integration tests" begin
 
 for L in 1:3
     if rank == 0
