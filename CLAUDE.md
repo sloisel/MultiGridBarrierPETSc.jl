@@ -95,6 +95,8 @@ using MultiGridBarrierPETSc
 - Do not automatically push commits to github unless asked by the user.
 - When the user gives permission to git commit and/or push once, that is not carte blanche to do it later.
 - Do not tag releases, TagBot will tag on github.
+- Do not put advertisement for Anthropic or Claude anywhere, especially in Commit messages.
+- Claude is not an author, Claude is a tool. S. Loisel is the author.
 
 ### IO
 
