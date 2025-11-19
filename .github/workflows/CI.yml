@@ -40,6 +40,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install MPI and Fortran dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mpich libmpich-dev gfortran libgfortran5
+
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -78,6 +83,11 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install MPI and Fortran dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mpich libmpich-dev gfortran libgfortran5
 
       - uses: actions/setup-python@v6
         with:
