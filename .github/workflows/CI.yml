@@ -58,6 +58,12 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
 
+      - name: Replace Julia's libcurl with system libcurl for PETSc compatibility
+        run: |
+          JULIA_LIBDIR="$(julia -e 'print(Sys.BINDIR)')"/../lib/julia
+          sudo rm -f "$JULIA_LIBDIR"/libcurl.so*
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4 "$JULIA_LIBDIR"/libcurl.so.4
+
       - uses: julia-actions/cache@v2
 
       - name: Configure MPI.jl and PETSc.jl to use system libraries
@@ -110,6 +116,12 @@ jobs:
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1.10'
+
+      - name: Replace Julia's libcurl with system libcurl for PETSc compatibility
+        run: |
+          JULIA_LIBDIR="$(julia -e 'print(Sys.BINDIR)')"/../lib/julia
+          sudo rm -f "$JULIA_LIBDIR"/libcurl.so*
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4 "$JULIA_LIBDIR"/libcurl.so.4
 
       - uses: julia-actions/cache@v2
 
