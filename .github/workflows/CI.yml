@@ -45,6 +45,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopenmpi-dev openmpi-bin
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - run: python -m pip install --upgrade pip
+
+      - run: pip install 'matplotlib==3.8.3'
+
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
@@ -80,6 +88,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libopenmpi-dev openmpi-bin
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - run: python -m pip install --upgrade pip
+
+      - run: pip install 'matplotlib==3.8.3'
 
       - uses: julia-actions/setup-julia@v2
         with:
