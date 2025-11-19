@@ -1,0 +1,33 @@
+# Julia
+.julia/
+.DS_Store
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
+
+# Project files
+Manifest.toml
+
+# PETSc
+.petscrc
+
+# Development
+dev/
+
+# Documentation
+docs/build/
+docs/docs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
