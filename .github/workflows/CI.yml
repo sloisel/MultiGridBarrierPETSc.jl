@@ -40,10 +40,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MPI and Fortran dependencies
+      - name: Install system PETSc with MUMPS and MPI
         run: |
           sudo apt-get update
-          sudo apt-get install -y mpich libmpich-dev gfortran libgfortran5
+          sudo apt-get install -y libpetsc-real-dev libopenmpi-dev
 
       - uses: actions/setup-python@v6
         with:
@@ -60,9 +60,19 @@ jobs:
 
       - uses: julia-actions/cache@v2
 
+      - name: Configure MPI.jl and PETSc.jl to use system libraries
+        run: |
+          julia --project -e 'using Pkg; Pkg.add("MPIPreferences"); using MPIPreferences; MPIPreferences.use_system_binary()'
+        env:
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+
       - uses: julia-actions/julia-buildpkg@v1
+        env:
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
 
       - uses: julia-actions/julia-runtest@v1
+        env:
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
 
       - uses: julia-actions/julia-processcoverage@v1
 
@@ -84,10 +94,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MPI and Fortran dependencies
+      - name: Install system PETSc with MUMPS and MPI
         run: |
           sudo apt-get update
-          sudo apt-get install -y mpich libmpich-dev gfortran libgfortran5
+          sudo apt-get install -y libpetsc-real-dev libopenmpi-dev
 
       - uses: actions/setup-python@v6
         with:
@@ -103,19 +113,30 @@ jobs:
 
       - uses: julia-actions/cache@v2
 
+      - name: Configure MPI.jl and PETSc.jl to use system libraries
+        run: |
+          julia --project -e 'using Pkg; Pkg.add("MPIPreferences"); using MPIPreferences; MPIPreferences.use_system_binary()'
+        env:
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+
       - name: Configure doc environment
         shell: julia --project=docs --color=yes {0}
         run: |
           using Pkg
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
+        env:
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
 
       - uses: julia-actions/julia-buildpkg@v1
+        env:
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
 
       - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
 
       - name: Run doctests
         shell: julia --project=docs --color=yes {0}
@@ -124,3 +145,5 @@ jobs:
           using MultiGridBarrierPETSc
           DocMeta.setdocmeta!(MultiGridBarrierPETSc, :DocTestSetup, :(using MultiGridBarrierPETSc); recursive=true)
           doctest(MultiGridBarrierPETSc)
+        env:
+          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
