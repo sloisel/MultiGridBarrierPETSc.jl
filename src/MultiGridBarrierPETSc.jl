@@ -34,13 +34,6 @@ using SafePETSc
 using SafePETSc: MPIDENSE, MPIAIJ
 using LinearAlgebra
 using SparseArrays
-
-# Install MultiGridBarrier if needed
-using Pkg
-if !haskey(Pkg.project().dependencies, "MultiGridBarrier")
-    @info "Installing MultiGridBarrier.jl v0.11.28..."
-    Pkg.add(name="MultiGridBarrier", version="0.11.28")
-end
 using MultiGridBarrier
 using MultiGridBarrier: Geometry, AMGBSOL
 
