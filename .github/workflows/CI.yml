@@ -28,6 +28,8 @@ jobs:
       actions: write
       contents: read
       statuses: write
+    env:
+      PETSC_VERSION: 3.22.3
     strategy:
       fail-fast: false
       matrix:
@@ -40,10 +42,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system PETSc with MUMPS and MPI
+      - name: Install MPI and build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpetsc-real-dev libopenmpi-dev
+          sudo apt-get install -y libopenmpi-dev gfortran make git
+
+      - name: Cache PETSc build
+        uses: actions/cache@v4
+        id: cache-petsc
+        with:
+          path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
+          key: petsc-${{ runner.os }}-${{ env.PETSC_VERSION }}-ompi-mumps
+
+      - name: Build PETSc with MUMPS (if cache miss)
+        if: steps.cache-petsc.outputs.cache-hit != 'true'
+        run: |
+          cd $RUNNER_TEMP
+          git clone --depth 1 --branch v${{ env.PETSC_VERSION }} https://gitlab.com/petsc/petsc.git petsc-src
+          cd petsc-src
+          ./configure \
+            --prefix=$RUNNER_TEMP/petsc-${{ env.PETSC_VERSION }} \
+            --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \
+            --with-debugging=0 \
+            --download-fblaslapack=1 \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --download-scalapack=1 \
+            --download-ptscotch=1 \
+            --download-mumps=1 \
+            --with-hdf5=0 \
+            --with-curl=0 \
+            --with-x=0 \
+            --with-shared-libraries=1
+          make all -j$(nproc)
+          make install
 
       - uses: actions/setup-python@v6
         with:
@@ -58,27 +90,21 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
 
-      - name: Replace Julia's libcurl with system libcurl for PETSc compatibility
-        run: |
-          JULIA_LIBDIR="$(julia -e 'print(Sys.BINDIR)')"/../lib/julia
-          sudo rm -f "$JULIA_LIBDIR"/libcurl.so*
-          sudo ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4 "$JULIA_LIBDIR"/libcurl.so.4
-
       - uses: julia-actions/cache@v2
 
-      - name: Configure MPI.jl and PETSc.jl to use system libraries
+      - name: Configure MPI.jl and PETSc.jl to use custom PETSc build
         run: |
           julia --project -e 'using Pkg; Pkg.add("MPIPreferences"); using MPIPreferences; MPIPreferences.use_system_binary()'
         env:
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
 
       - uses: julia-actions/julia-buildpkg@v1
         env:
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
 
       - uses: julia-actions/julia-runtest@v1
         env:
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
 
       - uses: julia-actions/julia-processcoverage@v1
 
@@ -97,13 +123,45 @@ jobs:
       statuses: write
       pages: write
       id-token: write
+    env:
+      PETSC_VERSION: 3.22.3
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system PETSc with MUMPS and MPI
+      - name: Install MPI and build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpetsc-real-dev libopenmpi-dev
+          sudo apt-get install -y libopenmpi-dev gfortran make git
+
+      - name: Cache PETSc build
+        uses: actions/cache@v4
+        id: cache-petsc
+        with:
+          path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
+          key: petsc-${{ runner.os }}-${{ env.PETSC_VERSION }}-ompi-mumps
+
+      - name: Build PETSc with MUMPS (if cache miss)
+        if: steps.cache-petsc.outputs.cache-hit != 'true'
+        run: |
+          cd $RUNNER_TEMP
+          git clone --depth 1 --branch v${{ env.PETSC_VERSION }} https://gitlab.com/petsc/petsc.git petsc-src
+          cd petsc-src
+          ./configure \
+            --prefix=$RUNNER_TEMP/petsc-${{ env.PETSC_VERSION }} \
+            --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \
+            --with-debugging=0 \
+            --download-fblaslapack=1 \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --download-scalapack=1 \
+            --download-ptscotch=1 \
+            --download-mumps=1 \
+            --with-hdf5=0 \
+            --with-curl=0 \
+            --with-x=0 \
+            --with-shared-libraries=1
+          make all -j$(nproc)
+          make install
 
       - uses: actions/setup-python@v6
         with:
@@ -117,19 +175,13 @@ jobs:
         with:
           version: '1.10'
 
-      - name: Replace Julia's libcurl with system libcurl for PETSc compatibility
-        run: |
-          JULIA_LIBDIR="$(julia -e 'print(Sys.BINDIR)')"/../lib/julia
-          sudo rm -f "$JULIA_LIBDIR"/libcurl.so*
-          sudo ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4 "$JULIA_LIBDIR"/libcurl.so.4
-
       - uses: julia-actions/cache@v2
 
-      - name: Configure MPI.jl and PETSc.jl to use system libraries
+      - name: Configure MPI.jl and PETSc.jl to use custom PETSc build
         run: |
           julia --project -e 'using Pkg; Pkg.add("MPIPreferences"); using MPIPreferences; MPIPreferences.use_system_binary()'
         env:
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
 
       - name: Configure doc environment
         shell: julia --project=docs --color=yes {0}
@@ -138,17 +190,17 @@ jobs:
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
         env:
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
 
       - uses: julia-actions/julia-buildpkg@v1
         env:
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
 
       - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
 
       - name: Run doctests
         shell: julia --project=docs --color=yes {0}
@@ -158,4 +210,4 @@ jobs:
           DocMeta.setdocmeta!(MultiGridBarrierPETSc, :DocTestSetup, :(using MultiGridBarrierPETSc); recursive=true)
           doctest(MultiGridBarrierPETSc)
         env:
-          JULIA_PETSC_LIBRARY: /usr/lib/x86_64-linux-gnu/libpetsc_real.so
+          JULIA_PETSC_LIBRARY: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}/lib
