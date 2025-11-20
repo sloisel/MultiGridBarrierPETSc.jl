@@ -20,6 +20,10 @@ end
         run_mpi_test("test_helpers.jl")
     end
 
+    @testset "Conversion functions" begin
+        run_mpi_test("test_conversions.jl")
+    end
+
     @testset "Quick integration test" begin
         run_mpi_test("test_quick.jl")
     end
