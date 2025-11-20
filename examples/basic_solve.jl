@@ -8,7 +8,7 @@
 # 3. Convert solution to native types
 # 4. Display results
 #
-# Run with: mpiexec -n 4 julia --project examples/basic_solve.jl
+# Run with: julia -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) examples/basic_solve.jl`)'
 #
 
 using MultiGridBarrierPETSc

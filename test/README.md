@@ -20,14 +20,16 @@ This automatically spawns 4 MPI processes to run the tests.
 
 ### Running MPI tests directly
 
-You can also run individual test files directly:
+You can also run individual test files directly using Julia's MPI launcher:
 
 ```bash
-mpiexec -n 4 julia --project=. test/test_helpers.jl
-mpiexec -n 4 julia --project=. test/test_geometry_conversion.jl
-mpiexec -n 4 julia --project=. test/test_fem2d_petsc.jl
-mpiexec -n 4 julia --project=. test/test_quick.jl
+julia --project=. -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) --project=. test/test_helpers.jl`)'
+julia --project=. -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) --project=. test/test_geometry_conversion.jl`)'
+julia --project=. -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) --project=. test/test_fem2d_petsc.jl`)'
+julia --project=. -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) --project=. test/test_quick.jl`)'
 ```
+
+This uses `MPI.mpiexec()` to get the correct MPI launcher configured for your Julia installation.
 
 ## Test Suite Overview
 

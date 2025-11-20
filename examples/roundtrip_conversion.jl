@@ -9,7 +9,7 @@
 # 4. Converting everything back to native types
 # 5. Verifying accuracy of conversions
 #
-# Run with: mpiexec -n 4 julia --project examples/roundtrip_conversion.jl
+# Run with: julia -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) examples/roundtrip_conversion.jl`)'
 #
 
 using MultiGridBarrierPETSc

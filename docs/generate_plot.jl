@@ -1,7 +1,7 @@
 #!/usr/bin/env julia
 #
 # Generate plot for documentation
-# Run with: mpiexec -n 4 julia --project docs/generate_plot.jl
+# Run with: julia --project -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) --project docs/generate_plot.jl`)'
 #
 
 using MPI

@@ -43,10 +43,10 @@ end
 **Run with 4 MPI ranks using Julia's MPI launcher:**
 
 ```bash
-julia --project -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) --project example.jl`)'
+julia -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) example.jl`)'
 ```
 
-This command uses `MPI.mpiexec()` to get the correct MPI launcher configured for your Julia installation, avoiding compatibility issues with system `mpiexec`.
+This command uses `MPI.mpiexec()` to get the correct MPI launcher configured for your Julia installation, avoiding compatibility issues with system `mpiexec`. Add `--project` or other Julia options as needed for your environment.
 
 ![2D p-Laplace Solution](fem2d_petsc.svg)
 

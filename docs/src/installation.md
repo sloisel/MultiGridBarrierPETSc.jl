@@ -137,11 +137,19 @@ sol = fem2d_petsc_solve(Float64; L=3, p=1.0)
 println(io0(), "Solution computed!")
 ```
 
-Run with `mpiexec`:
+Run with Julia's MPI launcher:
 
 ```bash
-mpiexec -n 4 julia --project my_program.jl
+julia -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) my_program.jl`)'
 ```
+
+This uses `MPI.mpiexec()` to get the correct MPI launcher configured for your Julia installation, avoiding compatibility issues with system `mpiexec`.
+
+!!! tip "Julia Options"
+    Add `--project`, `--threads`, or other Julia options as needed for your environment:
+    ```bash
+    julia --project=/path/to/project -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) --project=/path/to/project my_program.jl`)'
+    ```
 
 !!! tip "Output from Rank 0 Only"
     Use `io0()` from SafePETSc for output to avoid duplicate messages:

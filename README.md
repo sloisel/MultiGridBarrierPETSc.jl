@@ -57,11 +57,13 @@ See the [Installation Guide](https://sloisel.github.io/MultiGridBarrierPETSc.jl/
 
 ```bash
 # Basic solve example
-mpiexec -n 4 julia --project examples/basic_solve.jl
+julia -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) examples/basic_solve.jl`)'
 
 # Round-trip conversion example
-mpiexec -n 4 julia --project examples/roundtrip_conversion.jl
+julia -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) examples/roundtrip_conversion.jl`)'
 ```
+
+Add `--project` or other Julia options as needed for your environment.
 
 ## Testing
 

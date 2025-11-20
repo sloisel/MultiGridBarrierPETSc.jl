@@ -52,8 +52,10 @@ println(io0(), "Solution plotted!")
 !!! tip "Running This Example"
     Save this code to a file (e.g., `visualize.jl`) and run with:
     ```bash
-    mpiexec -n 4 julia --project visualize.jl
+    julia -e 'using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) visualize.jl`)'
     ```
+
+    This uses `MPI.mpiexec()` to get the correct MPI launcher configured for your Julia installation, avoiding compatibility issues with system `mpiexec`. Add `--project` or other Julia options as needed for your environment.
 
     This will create `solution_plot.png` showing the computed solution.
 
