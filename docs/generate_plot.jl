@@ -20,9 +20,17 @@ sol_native = sol_petsc_to_native(sol_petsc)
 # Only rank 0 creates the plot
 rank = MPI.Comm_rank(MPI.COMM_WORLD)
 if rank == 0
-    figure(figsize=(8, 6))
+    fig = figure(figsize=(8, 6))
     plot(sol_native)
-    title("2D p-Laplace Solution (L=3, p=1.0)")
+    suptitle("2D p-Laplace Solution (L=3, p=1.0)")
+    # Hide outer 2D axes by turning off frame on all non-3D axes
+    for ax in fig.axes
+        if !hasproperty(ax, :zaxis)  # Not a 3D axis
+            ax.set_frame_on(false)
+            ax.set_xticks([])
+            ax.set_yticks([])
+        end
+    end
     tight_layout()
     savefig("docs/src/fem2d_petsc.svg")
     close()
