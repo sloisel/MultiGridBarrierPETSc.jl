@@ -42,40 +42,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MPI and build dependencies
+      - name: Install MPI runtime
         run: |
           sudo apt-get update
-          sudo apt-get install -y libopenmpi-dev gfortran make git
+          sudo apt-get install -y libopenmpi-dev
 
-      - name: Cache PETSc build
-        uses: actions/cache@v4
-        id: cache-petsc
-        with:
-          path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
-          key: petsc-${{ runner.os }}-${{ env.PETSC_VERSION }}-ompi-mumps
-
-      - name: Build PETSc with MUMPS (if cache miss)
-        if: steps.cache-petsc.outputs.cache-hit != 'true'
+      - name: Download prebuilt PETSc with MUMPS
         run: |
-          cd $RUNNER_TEMP
-          git clone --depth 1 --branch v${{ env.PETSC_VERSION }} https://gitlab.com/petsc/petsc.git petsc-src
-          cd petsc-src
-          ./configure \
-            --prefix=$RUNNER_TEMP/petsc-${{ env.PETSC_VERSION }} \
-            --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \
-            --with-debugging=0 \
-            --download-fblaslapack=1 \
-            --download-metis=1 \
-            --download-parmetis=1 \
-            --download-scalapack=1 \
-            --download-ptscotch=1 \
-            --download-mumps=1 \
-            --with-hdf5=0 \
-            --with-curl=0 \
-            --with-x=0 \
-            --with-shared-libraries=1
-          make all -j$(nproc)
-          make install
+          wget -q https://github.com/${{ github.repository }}/releases/download/petsc-v${{ env.PETSC_VERSION }}-ubuntu-latest/petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
+          tar -xzf petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz -C $RUNNER_TEMP
+          rm petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
+          echo "✓ PETSc ${{ env.PETSC_VERSION }} with MUMPS ready"
 
       - uses: actions/setup-python@v6
         with:
@@ -128,40 +105,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MPI and build dependencies
+      - name: Install MPI runtime
         run: |
           sudo apt-get update
-          sudo apt-get install -y libopenmpi-dev gfortran make git
+          sudo apt-get install -y libopenmpi-dev
 
-      - name: Cache PETSc build
-        uses: actions/cache@v4
-        id: cache-petsc
-        with:
-          path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
-          key: petsc-${{ runner.os }}-${{ env.PETSC_VERSION }}-ompi-mumps
-
-      - name: Build PETSc with MUMPS (if cache miss)
-        if: steps.cache-petsc.outputs.cache-hit != 'true'
+      - name: Download prebuilt PETSc with MUMPS
         run: |
-          cd $RUNNER_TEMP
-          git clone --depth 1 --branch v${{ env.PETSC_VERSION }} https://gitlab.com/petsc/petsc.git petsc-src
-          cd petsc-src
-          ./configure \
-            --prefix=$RUNNER_TEMP/petsc-${{ env.PETSC_VERSION }} \
-            --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \
-            --with-debugging=0 \
-            --download-fblaslapack=1 \
-            --download-metis=1 \
-            --download-parmetis=1 \
-            --download-scalapack=1 \
-            --download-ptscotch=1 \
-            --download-mumps=1 \
-            --with-hdf5=0 \
-            --with-curl=0 \
-            --with-x=0 \
-            --with-shared-libraries=1
-          make all -j$(nproc)
-          make install
+          wget -q https://github.com/${{ github.repository }}/releases/download/petsc-v${{ env.PETSC_VERSION }}-ubuntu-latest/petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
+          tar -xzf petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz -C $RUNNER_TEMP
+          rm petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
+          echo "✓ PETSc ${{ env.PETSC_VERSION }} with MUMPS ready"
 
       - uses: actions/setup-python@v6
         with:
