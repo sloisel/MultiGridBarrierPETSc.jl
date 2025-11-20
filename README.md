@@ -43,7 +43,7 @@ Pkg.add("MultiGridBarrierPETSc")
 **Prerequisites:**
 - Julia 1.9 or later
 - MPI installation (OpenMPI, MPICH, or Intel MPI)
-- PETSc with MUMPS (automatically configured via SafePETSc.jl)
+- PETSc with MUMPS (macOS: `brew install petsc`, Linux: build from source)
 
 See the [Installation Guide](https://sloisel.github.io/MultiGridBarrierPETSc.jl/dev/installation/) for detailed instructions.
 

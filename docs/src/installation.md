@@ -28,7 +28,45 @@ mpiexec --version
 
 ### 2. PETSc with MUMPS
 
-PETSc will be automatically installed by SafePETSc.jl with MUMPS support. No manual installation required!
+PETSc with MUMPS is required for the direct solver used in Newton iterations.
+
+**macOS (Homebrew - Recommended):**
+```bash
+brew install petsc
+```
+Homebrew's PETSc includes MUMPS support by default.
+
+**Linux - Building from Source:**
+
+On Linux, you'll need to build PETSc from source with MUMPS. Due to compatibility issues with HDF5 and curl in some build environments, we recommend building without these optional dependencies:
+
+```bash
+# Download PETSc
+git clone -b release https://gitlab.com/petsc/petsc.git petsc
+cd petsc
+
+# Configure with MUMPS, without HDF5/curl
+./configure \
+  --with-debugging=0 \
+  --download-mumps \
+  --download-scalapack \
+  --download-parmetis \
+  --download-metis \
+  --download-openblas \
+  --with-hdf5=0 \
+  --with-ssl=0
+
+# Build (use appropriate -j value for your system)
+make PETSC_DIR=$PWD PETSC_ARCH=arch-linux-c-opt all
+
+# Set environment variable for Julia
+export JULIA_PETSC_LIBRARY=/path/to/petsc/arch-linux-c-opt/lib/libpetsc.so
+```
+
+Add the `JULIA_PETSC_LIBRARY` export to your `~/.bashrc` or `~/.zshrc` for persistence.
+
+!!! note "HDF5/curl Build Issues"
+    The `--with-hdf5=0 --with-ssl=0` flags disable HDF5 and curl support, which can cause build failures in CI environments and some Linux distributions. These features are not required for MultiGridBarrierPETSc.jl. See [PETSc installation documentation](https://petsc.org/release/install/) for more details.
 
 ## Package Installation
 
