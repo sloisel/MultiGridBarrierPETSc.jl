@@ -30,6 +30,7 @@ jobs:
       statuses: write
     env:
       PETSC_VERSION: 3.22.3
+      OMPI_MCA_rmaps_base_oversubscribe: 1
     strategy:
       fail-fast: false
       matrix:
@@ -102,6 +103,7 @@ jobs:
       id-token: write
     env:
       PETSC_VERSION: 3.22.3
+      OMPI_MCA_rmaps_base_oversubscribe: 1
     steps:
       - uses: actions/checkout@v4
 
