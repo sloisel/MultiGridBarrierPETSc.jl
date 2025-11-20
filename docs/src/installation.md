@@ -28,45 +28,31 @@ mpiexec --version
 
 ### 2. PETSc with MUMPS
 
-PETSc with MUMPS is required for the direct solver used in Newton iterations.
+MultiGridBarrierPETSc.jl requires PETSc compiled with MUMPS support for direct solver functionality.
 
-**macOS (Homebrew - Recommended):**
+**Default Installation (Most Users)**
+
+When you install MultiGridBarrierPETSc.jl, it automatically installs:
+- `PETSc.jl` (Julia wrapper)
+- `PETSc_jll.jl` (precompiled PETSc binary)
+
+**The `PETSc_jll` binary may or may not include MUMPS depending on your platform.** It is known to include MUMPS on macOS, but may not on some Linux distributions (e.g., GitHub Actions Ubuntu runners).
+
+If the default binary doesn't include MUMPS, you'll need to configure a custom PETSc build (see below).
+
+**HPC and Custom Builds**
+
+For high-performance computing environments or when the default `PETSc_jll` lacks MUMPS support, follow the [official PETSc.jl configuration guide](https://juliaparallel.org/PETSc.jl/dev/man/getting_started/#Using-a-custom-build-of-the-library) to link to an external PETSc installation.
+
+**Linux Build Considerations**
+
+On some Linux platforms, there are known incompatibilities between Julia's bundled libraries and PETSc's optional HDF5 and curl features (see [HDF5.jl issue #1079](https://github.com/JuliaIO/HDF5.jl/issues/1079) for details). If you build PETSc from source, you may need to disable these features:
+
 ```bash
-brew install petsc
-```
-Homebrew's PETSc includes MUMPS support by default.
-
-**Linux - Building from Source:**
-
-On Linux, you'll need to build PETSc from source with MUMPS. Due to compatibility issues with HDF5 and curl in some build environments, we recommend building without these optional dependencies:
-
-```bash
-# Download PETSc
-git clone -b release https://gitlab.com/petsc/petsc.git petsc
-cd petsc
-
-# Configure with MUMPS, without HDF5/curl
-./configure \
-  --with-debugging=0 \
-  --download-mumps \
-  --download-scalapack \
-  --download-parmetis \
-  --download-metis \
-  --download-openblas \
-  --with-hdf5=0 \
-  --with-ssl=0
-
-# Build (use appropriate -j value for your system)
-make PETSC_DIR=$PWD PETSC_ARCH=arch-linux-c-opt all
-
-# Set environment variable for Julia
-export JULIA_PETSC_LIBRARY=/path/to/petsc/arch-linux-c-opt/lib/libpetsc.so
+./configure --with-hdf5=0 --with-ssl=0 [other options...]
 ```
 
-Add the `JULIA_PETSC_LIBRARY` export to your `~/.bashrc` or `~/.zshrc` for persistence.
-
-!!! note "HDF5/curl Build Issues"
-    The `--with-hdf5=0 --with-ssl=0` flags disable HDF5 and curl support, which can cause build failures in CI environments and some Linux distributions. These features are not required for MultiGridBarrierPETSc.jl. See [PETSc installation documentation](https://petsc.org/release/install/) for more details.
+See the [PETSc installation documentation](https://petsc.org/release/install/install/) for complete configuration options.
 
 ## Package Installation
 

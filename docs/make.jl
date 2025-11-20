@@ -8,6 +8,7 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://sloisel.github.io/MultiGridBarrierPETSc.jl",
+        repolink="https://github.com/sloisel/MultiGridBarrierPETSc.jl",
         assets=String[],
     ),
     pages=[
@@ -16,7 +17,7 @@ makedocs(;
         "User Guide" => "guide.md",
         "API Reference" => "api.md",
     ],
-    repo="https://github.com/sloisel/MultiGridBarrierPETSc.jl",
+    repo=Documenter.Remotes.GitHub("sloisel", "MultiGridBarrierPETSc.jl"),
     warnonly=true,  # Don't fail on warnings during development
 )
 
