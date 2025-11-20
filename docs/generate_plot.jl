@@ -23,10 +23,9 @@ if rank == 0
     fig = figure(figsize=(8, 6))
     plot(sol_native)
     suptitle("2D p-Laplace Solution (L=3, p=1.0)")
-    # Hide outer 2D axes by turning off frame on all non-3D axes
+    # Hide ticks on outer 2D axes, keep the frame
     for ax in fig.axes
         if !hasproperty(ax, :zaxis)  # Not a 3D axis
-            ax.set_frame_on(false)
             ax.set_xticks([])
             ax.set_yticks([])
         end
