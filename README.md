@@ -45,12 +45,12 @@ Pkg.add("MultiGridBarrierPETSc")
 - MPI installation (OpenMPI, MPICH, or Intel MPI)
 - PETSc with MUMPS (automatically configured via SafePETSc.jl)
 
-See the [Installation Guide](https://sloisel.github.io/MultiGridBarrierPETSc.jl/stable/installation/) for detailed instructions.
+See the [Installation Guide](https://sloisel.github.io/MultiGridBarrierPETSc.jl/dev/installation/) for detailed instructions.
 
 ## Documentation
 
-- **[User Guide](https://sloisel.github.io/MultiGridBarrierPETSc.jl/stable/guide/)**: Workflows, examples, and best practices
-- **[API Reference](https://sloisel.github.io/MultiGridBarrierPETSc.jl/stable/api/)**: Complete function documentation
+- **[User Guide](https://sloisel.github.io/MultiGridBarrierPETSc.jl/dev/guide/)**: Workflows, examples, and best practices
+- **[API Reference](https://sloisel.github.io/MultiGridBarrierPETSc.jl/dev/api/)**: Complete function documentation
 - **[Examples](examples/)**: Runnable example scripts
 
 ## Running Examples
