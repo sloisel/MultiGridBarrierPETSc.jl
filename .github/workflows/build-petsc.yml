@@ -1,0 +1,115 @@
+name: Build PETSc+MUMPS Bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      petsc_version:
+        description: 'PETSc version to build'
+        required: false
+        default: '3.22.3'
+        type: string
+
+jobs:
+  build:
+    name: Build PETSc ${{ inputs.petsc_version }} with MUMPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    env:
+      PETSC_VERSION: ${{ inputs.petsc_version }}
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenmpi-dev gfortran make git
+
+      - name: Build PETSc with MUMPS
+        run: |
+          cd $RUNNER_TEMP
+          echo "Cloning PETSc v${PETSC_VERSION}..."
+          git clone --depth 1 --branch v${PETSC_VERSION} https://gitlab.com/petsc/petsc.git petsc-src
+          cd petsc-src
+
+          echo "Configuring PETSc with MUMPS..."
+          ./configure \
+            --prefix=$RUNNER_TEMP/petsc-${PETSC_VERSION} \
+            --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \
+            --with-debugging=0 \
+            --download-fblaslapack=1 \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --download-scalapack=1 \
+            --download-ptscotch=1 \
+            --download-mumps=1 \
+            --with-hdf5=0 \
+            --with-curl=0 \
+            --with-x=0 \
+            --with-shared-libraries=1
+
+          echo "Building PETSc (this will take ~10 minutes)..."
+          make all -j$(nproc)
+
+          echo "Installing PETSc to prefix..."
+          make install
+
+          echo "Build complete!"
+
+      - name: Verify PETSc installation
+        run: |
+          echo "Checking for libpetsc.so..."
+          test -f $RUNNER_TEMP/petsc-${PETSC_VERSION}/lib/libpetsc.so || {
+            echo "ERROR: libpetsc.so not found!"
+            exit 1
+          }
+
+          echo "Listing installed libraries:"
+          ls -lh $RUNNER_TEMP/petsc-${PETSC_VERSION}/lib/*.so | head -20
+
+          echo "Checking for MUMPS in PETSc..."
+          if ldd $RUNNER_TEMP/petsc-${PETSC_VERSION}/lib/libpetsc.so | grep -i mumps; then
+            echo "✓ MUMPS found in PETSc"
+          else
+            echo "⚠ MUMPS not found in ldd output (may be statically linked)"
+          fi
+
+          echo "Installation verified!"
+
+      - name: Create tarball
+        run: |
+          cd $RUNNER_TEMP
+          echo "Creating tarball..."
+          tar -czf petsc-${PETSC_VERSION}-ubuntu-latest.tar.gz petsc-${PETSC_VERSION}
+
+          echo "Tarball info:"
+          ls -lh petsc-${PETSC_VERSION}-ubuntu-latest.tar.gz
+
+          echo "Tarball contents (top-level):"
+          tar -tzf petsc-${PETSC_VERSION}-ubuntu-latest.tar.gz | head -20
+
+      - name: Upload PETSc tarball as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: petsc-${{ env.PETSC_VERSION }}-ubuntu-latest
+          path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
+          retention-days: 90
+
+      - name: Build summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Successfully built PETSc ${PETSC_VERSION} with MUMPS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifact:** \`petsc-${PETSC_VERSION}-ubuntu-latest.tar.gz\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Size:** $(ls -lh $RUNNER_TEMP/petsc-${PETSC_VERSION}-ubuntu-latest.tar.gz | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Configure flags:**" >> $GITHUB_STEP_SUMMARY
+          echo "- MUMPS enabled (--download-mumps=1)" >> $GITHUB_STEP_SUMMARY
+          echo "- No HDF5/curl dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "- Optimized build (--with-debugging=0)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download the artifact from this workflow run" >> $GITHUB_STEP_SUMMARY
+          echo "2. Inspect the tarball contents" >> $GITHUB_STEP_SUMMARY
+          echo "3. (Optional) Create a GitHub release and upload as asset" >> $GITHUB_STEP_SUMMARY
