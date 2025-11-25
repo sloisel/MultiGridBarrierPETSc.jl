@@ -63,8 +63,8 @@ Depth = 2
 
 This package is part of a larger ecosystem:
 
-- **[MultiGridBarrier.jl](https://github.com/yourusername/MultiGridBarrier.jl)**: Core multigrid barrier method implementation
-- **[SafePETSc.jl](https://github.com/yourusername/SafePETSc.jl)**: Safe PETSc bindings with automatic memory management
+- **[MultiGridBarrier.jl](https://github.com/sloisel/MultiGridBarrier.jl)**: Core multigrid barrier method implementation
+- **[SafePETSc.jl](https://github.com/sloisel/SafePETSc.jl)**: Safe PETSc bindings with automatic memory management
 - **MPI.jl**: Julia MPI bindings for distributed computing
 
 ## Requirements
@@ -83,7 +83,7 @@ If you use this package in your research, please cite:
   author = {Loisel, Sebastien},
   title = {MultiGridBarrierPETSc.jl: Distributed Multigrid Barrier Methods},
   year = {2024},
-  url = {https://github.com/yourusername/MultiGridBarrierPETSc.jl}
+  url = {https://github.com/sloisel/MultiGridBarrierPETSc.jl}
 }
 ```
 

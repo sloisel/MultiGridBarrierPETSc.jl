@@ -12,9 +12,8 @@ MultiGridBarrierPETSc.jl extends MultiGridBarrier's API to work with PETSc's dis
 ## Quick Start
 
 ```julia
-using SafePETSc
 using MultiGridBarrierPETSc
-SafePETSc.Init()  # Initialize MPI and PETSc
+MultiGridBarrierPETSc.Init()  # Initialize MPI, PETSc, and MUMPS solver
 
 # Solve a 2D finite element problem with PETSc distributed types
 sol = fem2d_petsc_solve(Float64; L=3, p=1.0, verbose=false)
@@ -41,7 +40,7 @@ Pkg.add("MultiGridBarrierPETSc")
 ```
 
 **Prerequisites:**
-- Julia 1.9 or later
+- Julia 1.10 or later
 - MPI installation (OpenMPI, MPICH, or Intel MPI)
 - PETSc with MUMPS (automatically installed via PETSc_jll.jl, or custom build for HPC)
 

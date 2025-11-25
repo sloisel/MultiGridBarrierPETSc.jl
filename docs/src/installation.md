@@ -69,13 +69,13 @@ To install the development version:
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/yourusername/MultiGridBarrierPETSc.jl")
+Pkg.add(url="https://github.com/sloisel/MultiGridBarrierPETSc.jl")
 ```
 
 Or clone and develop locally:
 
 ```bash
-git clone https://github.com/yourusername/MultiGridBarrierPETSc.jl
+git clone https://github.com/sloisel/MultiGridBarrierPETSc.jl
 cd MultiGridBarrierPETSc.jl
 julia --project -e 'using Pkg; Pkg.instantiate()'
 ```
