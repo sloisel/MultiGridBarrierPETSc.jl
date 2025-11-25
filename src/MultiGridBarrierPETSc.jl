@@ -6,8 +6,12 @@ distributed types through SafePETSc.
 
 # Exports
 - `Init`: Initialize MultiGridBarrierPETSc with MPI, PETSc, and solver options
+- `fem1d_petsc`: Creates a PETSc-based Geometry from fem1d parameters
+- `fem1d_petsc_solve`: Solves a fem1d problem using amgb with PETSc types
 - `fem2d_petsc`: Creates a PETSc-based Geometry from fem2d parameters
 - `fem2d_petsc_solve`: Solves a fem2d problem using amgb with PETSc types
+- `fem3d_petsc`: Creates a PETSc-based Geometry from fem3d parameters
+- `fem3d_petsc_solve`: Solves a fem3d problem using amgb with PETSc types
 - `geometry_native_to_petsc`: Converts native Geometry to PETSc distributed types
 - `geometry_petsc_to_native`: Converts PETSc Geometry back to native Julia types
 - `sol_petsc_to_native`: Converts AMGBSOL with PETSc types to native Julia types
@@ -17,11 +21,17 @@ distributed types through SafePETSc.
 using MultiGridBarrierPETSc
 MultiGridBarrierPETSc.Init()  # Initialize MPI and PETSc
 
-# Create PETSc geometry
-g = fem2d_petsc(Float64; maxh=0.1)
+# 1D: Create PETSc geometry and solve
+g1d = fem1d_petsc(Float64; L=4)
+sol1d = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=true)
 
-# Solve the problem
+# 2D: Create PETSc geometry and solve
+g = fem2d_petsc(Float64; maxh=0.1)
 sol = fem2d_petsc_solve(Float64; maxh=0.1, p=2.0, verbose=true)
+
+# 3D: Create PETSc geometry and solve
+g3d = fem3d_petsc(Float64; L=2, k=3)
+sol3d = fem3d_petsc_solve(Float64; L=2, k=3, p=1.0, verbose=true)
 
 # Convert solution back to native types for analysis
 sol_native = sol_petsc_to_native(sol)
@@ -35,7 +45,9 @@ using SafePETSc: MPIDENSE, MPIAIJ
 using LinearAlgebra
 using SparseArrays
 using MultiGridBarrier
-using MultiGridBarrier: Geometry, AMGBSOL
+using MultiGridBarrier: Geometry, AMGBSOL, fem1d, FEM1D
+using MultiGridBarrier3d
+using MultiGridBarrier3d: fem3d, FEM3D
 
 # ============================================================================
 # MultiGridBarrier API Implementation for SafePETSc Types
@@ -113,10 +125,10 @@ while MPIAIJ indicates sparse storage (for operators and subspace matrices).
 """
 function geometry_native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, SparseMatrixCSC{T,Int}, Discretization}) where {T, Discretization}
     # Convert x (geometry coordinates) to MPIDENSE Mat
-    x_petsc = Mat_uniform(g_native.x; Prefix=MPIDENSE)
+    x_petsc = SafePETSc.Mat_uniform(g_native.x; Prefix=MPIDENSE)
 
     # Convert w (weights) to MPIDENSE Vec (weights are uniform/dense data)
-    w_petsc = Vec_uniform(g_native.w; Prefix=MPIDENSE)
+    w_petsc = SafePETSc.Vec_uniform(g_native.w; Prefix=MPIDENSE)
 
     # Convert all operators to MPIAIJ Mat
     # Mat_uniform distributes the uniform matrix across ranks as MPIAIJ (sparse, partitioned)
@@ -124,7 +136,7 @@ function geometry_native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, Sp
     operators_petsc = Dict{Symbol, Any}()
     for key in sort(collect(keys(g_native.operators)))
         op = g_native.operators[key]
-        operators_petsc[key] = Mat_uniform(op; Prefix=MPIAIJ)
+        operators_petsc[key] = SafePETSc.Mat_uniform(op; Prefix=MPIAIJ)
     end
 
     # Convert all subspace matrices to MPIAIJ Mat
@@ -134,7 +146,7 @@ function geometry_native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, Sp
         subspace_vec = g_native.subspaces[key]
         petsc_vec = Vector{Any}(undef, length(subspace_vec))
         for i in 1:length(subspace_vec)
-            petsc_vec[i] = Mat_uniform(subspace_vec[i]; Prefix=MPIAIJ)
+            petsc_vec[i] = SafePETSc.Mat_uniform(subspace_vec[i]; Prefix=MPIAIJ)
         end
         subspaces_petsc[key] = petsc_vec
     end
@@ -142,12 +154,12 @@ function geometry_native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, Sp
     # Convert refine and coarsen vectors to MPIAIJ Mat
     refine_petsc = Vector{Any}(undef, length(g_native.refine))
     for i in 1:length(g_native.refine)
-        refine_petsc[i] = Mat_uniform(g_native.refine[i]; Prefix=MPIAIJ)
+        refine_petsc[i] = SafePETSc.Mat_uniform(g_native.refine[i]; Prefix=MPIAIJ)
     end
 
     coarsen_petsc = Vector{Any}(undef, length(g_native.coarsen))
     for i in 1:length(g_native.coarsen)
-        coarsen_petsc[i] = Mat_uniform(g_native.coarsen[i]; Prefix=MPIAIJ)
+        coarsen_petsc[i] = SafePETSc.Mat_uniform(g_native.coarsen[i]; Prefix=MPIAIJ)
     end
 
     # Determine PETSc types for Geometry type parameters
@@ -358,7 +370,7 @@ function Init(; options="-MPIAIJ_ksp_type preonly -MPIAIJ_pc_type lu -MPIAIJ_pc_
     end
 
     # Initialize MPI and PETSc if not already initialized
-    if !MPI.Initialized()
+    if !SafePETSc.Initialized()
         SafePETSc.Init()
     end
 
@@ -372,6 +384,75 @@ function Init(; options="-MPIAIJ_ksp_type preonly -MPIAIJ_pc_type lu -MPIAIJ_pc_
     SafePETSc.petsc_options_insert_string(options)
 
     MGBPETSC_INITIALIZED[] = true
+end
+
+"""
+    fem1d_petsc(::Type{T}=Float64; kwargs...) where {T}
+
+**Collective**
+
+Create a PETSc-based Geometry from fem1d parameters.
+
+This function calls `fem1d(kwargs...)` to create a native 1D geometry, then converts
+it to use PETSc distributed types (Mat and Vec) for distributed computing.
+
+Note: Call `MultiGridBarrierPETSc.Init()` before using this function.
+
+# Arguments
+- `T::Type`: Element type for the geometry (default: Float64)
+- `kwargs...`: Additional keyword arguments passed to `fem1d()`:
+  - `L::Int`: Number of multigrid levels (default: 4), creating 2^L elements
+
+# Returns
+A Geometry object with PETSc distributed types.
+
+# Example
+```julia
+MultiGridBarrierPETSc.Init()
+g = fem1d_petsc(Float64; L=4)
+```
+"""
+function fem1d_petsc(::Type{T}=Float64; kwargs...) where {T}
+    # Create native 1D geometry
+    g_native = fem1d(T; kwargs...)
+
+    # Convert to PETSc types
+    return geometry_native_to_petsc(g_native)
+end
+
+"""
+    fem1d_petsc_solve(::Type{T}=Float64; kwargs...) where {T}
+
+**Collective**
+
+Solve a fem1d problem using amgb with PETSc distributed types.
+
+This is a convenience function that combines `fem1d_petsc` and `amgb` into a
+single call. It creates a PETSc-based 1D geometry and solves the barrier problem.
+
+# Arguments
+- `T::Type`: Element type for the geometry (default: Float64)
+- `kwargs...`: Keyword arguments passed to both `fem1d_petsc` and `amgb`
+  - `L::Int`: Number of multigrid levels (passed to fem1d)
+  - `p`: Power parameter for the barrier (passed to amgb)
+  - `verbose`: Verbosity flag (passed to amgb)
+  - Other arguments specific to fem1d or amgb
+
+# Returns
+The solution object from `amgb`.
+
+# Example
+```julia
+sol = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=true)
+println("Solution norm: ", norm(sol.z))
+```
+"""
+function fem1d_petsc_solve(::Type{T}=Float64; kwargs...) where {T}
+    # Create PETSc 1D geometry
+    g = fem1d_petsc(T; kwargs...)
+
+    # Solve using amgb (amgb auto-detects 1D from geometry.discretization)
+    return amgb(g; kwargs...)
 end
 
 """
@@ -442,9 +523,90 @@ function fem2d_petsc_solve(::Type{T}=Float64; kwargs...) where {T}
     return amgb(g; kwargs...)
 end
 
+"""
+    fem3d_petsc(::Type{T}=Float64; kwargs...) where {T}
+
+**Collective**
+
+Create a PETSc-based Geometry from fem3d parameters.
+
+This function calls `fem3d(kwargs...)` to create a native 3D geometry, then converts
+it to use PETSc distributed types (Mat and Vec) for distributed computing.
+
+Note: Call `MultiGridBarrierPETSc.Init()` before using this function.
+
+# Arguments
+- `T::Type`: Element type for the geometry (default: Float64)
+- `kwargs...`: Additional keyword arguments passed to `fem3d()`:
+  - `L::Int`: Number of multigrid levels (default: 2)
+  - `k::Int`: Polynomial order of elements (default: 3)
+  - `K`: Coarse Q1 mesh as an N×3 matrix (optional, defaults to unit cube)
+
+# Returns
+A Geometry object with PETSc distributed types.
+
+# Example
+```julia
+MultiGridBarrierPETSc.Init()
+g = fem3d_petsc(Float64; L=2, k=3)
+```
+"""
+function fem3d_petsc(::Type{T}=Float64; kwargs...) where {T}
+    # Create native 3D geometry
+    g_native = fem3d(T; kwargs...)
+
+    # Convert to PETSc types
+    return geometry_native_to_petsc(g_native)
+end
+
+"""
+    fem3d_petsc_solve(::Type{T}=Float64; kwargs...) where {T}
+
+**Collective**
+
+Solve a fem3d problem using amgb with PETSc distributed types.
+
+This is a convenience function that combines `fem3d_petsc` and `amgb` into a
+single call. It creates a PETSc-based 3D geometry and solves the barrier problem.
+
+# Arguments
+- `T::Type`: Element type for the geometry (default: Float64)
+- `kwargs...`: Keyword arguments passed to both `fem3d_petsc` and `amgb`
+  - `L::Int`: Number of multigrid levels (passed to fem3d)
+  - `k::Int`: Polynomial order of elements (passed to fem3d)
+  - `p`: Power parameter for the barrier (passed to amgb)
+  - `verbose`: Verbosity flag (passed to amgb)
+  - `D`: Operator structure matrix (passed to amgb, defaults to 3D operators)
+  - `f`: Source term function (passed to amgb, defaults to 3D source)
+  - `g`: Boundary condition function (passed to amgb, defaults to 3D BCs)
+  - Other arguments specific to fem3d or amgb
+
+# Returns
+The solution object from `amgb`.
+
+# Example
+```julia
+sol = fem3d_petsc_solve(Float64; L=2, k=3, p=1.0, verbose=true)
+println("Solution norm: ", norm(sol.z))
+```
+"""
+function fem3d_petsc_solve(::Type{T}=Float64;
+    D = [:u :id; :u :dx; :u :dy; :u :dz; :s :id],
+    f = (x) -> T[0.5, 0.0, 0.0, 0.0, 1.0],
+    g = (x) -> T[x[1]^2 + x[2]^2 + x[3]^2, 100.0],
+    kwargs...) where {T}
+    # Create PETSc 3D geometry
+    geom = fem3d_petsc(T; kwargs...)
+
+    # Solve using amgb with 3D-specific defaults
+    return amgb(geom; D=D, f=f, g=g, kwargs...)
+end
+
 # Export the public API
 export Init
+export fem1d_petsc, fem1d_petsc_solve
 export fem2d_petsc, fem2d_petsc_solve
+export fem3d_petsc, fem3d_petsc_solve
 export geometry_native_to_petsc, geometry_petsc_to_native, sol_petsc_to_native
 
 end # module MultiGridBarrierPETSc

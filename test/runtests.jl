@@ -24,7 +24,15 @@ end
         run_mpi_test("test_conversions.jl")
     end
 
-    @testset "Quick integration test" begin
+    @testset "Quick integration test (2D)" begin
         run_mpi_test("test_quick.jl")
+    end
+
+    @testset "3D integration test" begin
+        run_mpi_test("test_3d.jl")
+    end
+
+    @testset "1D integration test" begin
+        run_mpi_test("test_1d.jl")
     end
 end

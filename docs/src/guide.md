@@ -256,8 +256,157 @@ println(io0(), "Converged in $iters iterations")
 println(io0(), "Final objective: $obj")
 ```
 
+## 1D Problems
+
+MultiGridBarrierPETSc supports 1D finite element problems through MultiGridBarrier.jl.
+
+### Basic 1D Example
+
+```julia
+using MultiGridBarrierPETSc
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve a 1D problem with 4 multigrid levels (2^4 = 16 elements)
+sol = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=true)
+
+# Convert solution to native types for analysis
+sol_native = sol_petsc_to_native(sol)
+
+println(io0(), "Solution computed successfully!")
+println(io0(), "Iterations: ", length(sol_native.log))
+```
+
+### 1D Geometry Creation
+
+For more control, create the geometry separately:
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier
+MultiGridBarrierPETSc.Init()
+
+# Create 1D PETSc geometry
+g = fem1d_petsc(Float64; L=4)
+
+# Solve with custom parameters
+sol = amgb(g;
+    p=1.0,           # Barrier power parameter
+    verbose=true,    # Print convergence info
+    maxit=100)       # Maximum iterations
+
+# Convert solution back to native types
+sol_native = sol_petsc_to_native(sol)
+```
+
+### 1D Parameters
+
+The `fem1d_petsc` and `fem1d_petsc_solve` functions accept:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `L` | Number of multigrid levels (creates 2^L elements) | 4 |
+
+### Comparing 1D PETSc vs Native Solutions
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier
+using LinearAlgebra
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve with PETSc (distributed)
+sol_petsc = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=false)
+z_petsc = sol_petsc_to_native(sol_petsc).z
+
+# Solve with native (sequential)
+sol_native = MultiGridBarrier.fem1d_solve(Float64; L=4, p=1.0, verbose=false)
+z_native = sol_native.z
+
+# Compare solutions
+diff = norm(z_petsc - z_native) / norm(z_native)
+println(io0(), "Relative difference: ", diff)
+```
+
+## 3D Problems
+
+MultiGridBarrierPETSc also supports 3D hexahedral finite elements through MultiGridBarrier3d.jl.
+
+### Basic 3D Example
+
+```julia
+using MultiGridBarrierPETSc
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve a 3D problem with Q3 elements and 2 multigrid levels
+sol = fem3d_petsc_solve(Float64; L=2, k=3, p=1.0, verbose=true)
+
+# Convert solution to native types for analysis
+sol_native = sol_petsc_to_native(sol)
+
+println(io0(), "Solution computed successfully!")
+println(io0(), "Iterations: ", length(sol_native.log))
+```
+
+### 3D Geometry Creation
+
+For more control, create the geometry separately:
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier
+MultiGridBarrierPETSc.Init()
+
+# Create 3D PETSc geometry
+g = fem3d_petsc(Float64; L=2, k=3)
+
+# Solve with custom parameters
+sol = amgb(g;
+    p=1.0,           # Barrier power parameter
+    verbose=true,    # Print convergence info
+    maxit=100)       # Maximum iterations
+
+# Convert solution back to native types
+sol_native = sol_petsc_to_native(sol)
+```
+
+### 3D Parameters
+
+The `fem3d_petsc` and `fem3d_petsc_solve` functions accept:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `L` | Number of multigrid levels | 2 |
+| `k` | Polynomial order of elements (Q_k) | 3 |
+| `K` | Coarse Q1 mesh (N×3 matrix, 8 vertices per hex) | Unit cube [-1,1]³ |
+
+### Comparing 3D PETSc vs Native Solutions
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier3d
+using LinearAlgebra
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve with PETSc (distributed)
+sol_petsc = fem3d_petsc_solve(Float64; L=2, k=2, p=1.0, verbose=false)
+z_petsc = sol_petsc_to_native(sol_petsc).z
+
+# Solve with native (sequential)
+sol_native = MultiGridBarrier3d.fem3d_solve(Float64; L=2, k=2, p=1.0, verbose=false)
+z_native = sol_native.z
+
+# Compare solutions
+diff = norm(z_petsc - z_native) / norm(z_native)
+println(io0(), "Relative difference: ", diff)
+```
+
 ## Next Steps
 
 - See the [API Reference](@ref) for detailed function documentation
 - Check the `examples/` directory for complete runnable examples
 - Consult MultiGridBarrier.jl documentation for barrier method theory
+- Consult MultiGridBarrier3d.jl documentation for 3D FEM details

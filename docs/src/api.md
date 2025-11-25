@@ -17,9 +17,25 @@ Init
 
 These functions provide the simplest interface for solving problems with PETSc types.
 
+### 1D Problems
+
+```@docs
+fem1d_petsc
+fem1d_petsc_solve
+```
+
+### 2D Problems
+
 ```@docs
 fem2d_petsc
 fem2d_petsc_solve
+```
+
+### 3D Problems
+
+```@docs
+fem3d_petsc
+fem3d_petsc_solve
 ```
 
 ## Type Conversion API

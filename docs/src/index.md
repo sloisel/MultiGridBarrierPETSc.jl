@@ -8,6 +8,7 @@ MultiGridBarrierPETSc.jl extends the MultiGridBarrier.jl package to work with PE
 
 ## Key Features
 
+- **1D, 2D, and 3D Support**: Full support for 1D elements, 2D triangular, and 3D hexahedral finite elements
 - **Seamless Integration**: Drop-in replacement for MultiGridBarrier's native types
 - **Distributed Computing**: Leverage PETSc's distributed linear algebra for large-scale problems
 - **Type Conversion**: Easy conversion between native Julia arrays and PETSc distributed types
@@ -63,7 +64,8 @@ Depth = 2
 
 This package is part of a larger ecosystem:
 
-- **[MultiGridBarrier.jl](https://github.com/sloisel/MultiGridBarrier.jl)**: Core multigrid barrier method implementation
+- **[MultiGridBarrier.jl](https://github.com/sloisel/MultiGridBarrier.jl)**: Core multigrid barrier method implementation (2D)
+- **[MultiGridBarrier3d.jl](https://github.com/sloisel/MultiGridBarrier3d.jl)**: 3D hexahedral finite element extension
 - **[SafePETSc.jl](https://github.com/sloisel/SafePETSc.jl)**: Safe PETSc bindings with automatic memory management
 - **MPI.jl**: Julia MPI bindings for distributed computing
 
