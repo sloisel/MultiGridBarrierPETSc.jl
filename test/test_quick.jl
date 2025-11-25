@@ -16,9 +16,6 @@ comm = MPI.COMM_WORLD
 rank = MPI.Comm_rank(comm)
 nranks = MPI.Comm_size(comm)
 
-# Set DEBUG to false to enable PETSc solves with MUMPS direct solver
-SafePETSc.DEBUG[] = false
-
 if rank == 0
     println("[DEBUG] Quick integration test starting")
     flush(stdout)
