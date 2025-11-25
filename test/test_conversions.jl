@@ -26,17 +26,17 @@ end
 ts = @testset QuietTestSet "Conversion tests" begin
 
 # ============================================================================
-# Test geometry_petsc_to_native
+# Test native_to_petsc and petsc_to_native for Geometry
 # ============================================================================
 if rank == 0
-    println("[DEBUG] Testing geometry_petsc_to_native")
+    println("[DEBUG] Testing petsc_to_native for Geometry")
     flush(stdout)
 end
 
 # Create a native geometry and test round-trip conversion
 g_native_orig = fem2d(; maxh=0.3)
-g_petsc = geometry_native_to_petsc(g_native_orig)
-g_native_back = geometry_petsc_to_native(g_petsc)
+g_petsc = native_to_petsc(g_native_orig)
+g_native_back = petsc_to_native(g_petsc)
 
 # Test round-trip preserves values
 @test g_native_back.x ≈ g_native_orig.x
@@ -84,17 +84,17 @@ end
 @test all(isfinite.(g_native_back.w))
 
 # ============================================================================
-# Test sol_petsc_to_native
+# Test petsc_to_native for AMGBSOL
 # ============================================================================
 if rank == 0
-    println("[DEBUG] Testing sol_petsc_to_native")
+    println("[DEBUG] Testing petsc_to_native for AMGBSOL")
     flush(stdout)
 end
 
 # Create a PETSc solution
 g_petsc_solve = fem2d_petsc(Float64; maxh=0.3)
 sol_petsc = amgb(g_petsc_solve; p=2.0, verbose=false)
-sol_native = sol_petsc_to_native(sol_petsc)
+sol_native = petsc_to_native(sol_petsc)
 
 # Test z conversion
 @test sol_native.z ≈ SafePETSc.J(sol_petsc.z)
@@ -139,7 +139,7 @@ if sol_native.SOL_feasibility !== nothing
 end
 
 # Test consistency with direct geometry conversion
-g_native_direct = geometry_petsc_to_native(sol_petsc.geometry)
+g_native_direct = petsc_to_native(sol_petsc.geometry)
 @test sol_native.geometry.x ≈ g_native_direct.x
 @test sol_native.geometry.w ≈ g_native_direct.w
 

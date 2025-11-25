@@ -38,7 +38,7 @@ MultiGridBarrierPETSc.Init()
 sol_petsc = fem2d_petsc_solve(Float64; L=3, p=1.0, verbose=false)
 
 # Step 2: Convert solution to native Julia types
-sol_native = sol_petsc_to_native(sol_petsc)
+sol_native = petsc_to_native(sol_petsc)
 
 # Step 3: Plot the solution using MultiGridBarrier's plot function
 figure(figsize=(10, 8))
@@ -94,7 +94,7 @@ using MultiGridBarrier
 g_native = fem2d(; maxh=0.3)
 
 # Convert to PETSc types for distributed computation
-g_petsc = geometry_native_to_petsc(g_native)
+g_petsc = native_to_petsc(g_native)
 ```
 
 **Type mappings:**
@@ -115,8 +115,8 @@ g_petsc = fem2d_petsc(Float64; maxh=0.3)
 sol_petsc = amgb(g_petsc; p=2.0)
 
 # Convert back for analysis
-g_native = geometry_petsc_to_native(g_petsc)
-sol_native = sol_petsc_to_native(sol_petsc)
+g_native = petsc_to_native(g_petsc)
+sol_native = petsc_to_native(sol_petsc)
 
 # Now you can use native Julia operations
 using LinearAlgebra
@@ -140,7 +140,7 @@ MultiGridBarrierPETSc.Init()
 g_native = fem2d(; maxh=0.2, L=2)
 
 # 2. Convert to PETSc for distributed solving
-g_petsc = geometry_native_to_petsc(g_native)
+g_petsc = native_to_petsc(g_native)
 
 # 3. Solve with custom barrier parameters
 sol_petsc = amgb(g_petsc;
@@ -150,7 +150,7 @@ sol_petsc = amgb(g_petsc;
     tol=1e-8)        # Convergence tolerance
 
 # 4. Convert solution back
-sol_native = sol_petsc_to_native(sol_petsc)
+sol_native = petsc_to_native(sol_petsc)
 
 # 5. Access solution components
 println(io0(), "Objective value: ", sol_native.SOL_main.objective)
@@ -169,7 +169,7 @@ MultiGridBarrierPETSc.Init()
 
 # Solve with PETSc (distributed)
 sol_petsc_dist = fem2d_petsc_solve(Float64; L=2, p=1.0, verbose=false)
-z_petsc = sol_petsc_to_native(sol_petsc_dist).z
+z_petsc = petsc_to_native(sol_petsc_dist).z
 
 # Solve with native (sequential, on rank 0)
 rank = MPI.Comm_rank(MPI.COMM_WORLD)
@@ -245,7 +245,7 @@ using MultiGridBarrierPETSc
 MultiGridBarrierPETSc.Init()
 
 sol = fem2d_petsc_solve(Float64; L=3, p=1.0)
-sol_native = sol_petsc_to_native(sol)
+sol_native = petsc_to_native(sol)
 
 # Access solution data
 z = sol_native.z  # Solution matrix
@@ -271,7 +271,7 @@ MultiGridBarrierPETSc.Init()
 sol = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=true)
 
 # Convert solution to native types for analysis
-sol_native = sol_petsc_to_native(sol)
+sol_native = petsc_to_native(sol)
 
 println(io0(), "Solution computed successfully!")
 println(io0(), "Iterations: ", length(sol_native.log))
@@ -296,7 +296,7 @@ sol = amgb(g;
     maxit=100)       # Maximum iterations
 
 # Convert solution back to native types
-sol_native = sol_petsc_to_native(sol)
+sol_native = petsc_to_native(sol)
 ```
 
 ### 1D Parameters
@@ -318,7 +318,7 @@ MultiGridBarrierPETSc.Init()
 
 # Solve with PETSc (distributed)
 sol_petsc = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=false)
-z_petsc = sol_petsc_to_native(sol_petsc).z
+z_petsc = petsc_to_native(sol_petsc).z
 
 # Solve with native (sequential)
 sol_native = MultiGridBarrier.fem1d_solve(Float64; L=4, p=1.0, verbose=false)
@@ -344,7 +344,7 @@ MultiGridBarrierPETSc.Init()
 sol = fem3d_petsc_solve(Float64; L=2, k=3, p=1.0, verbose=true)
 
 # Convert solution to native types for analysis
-sol_native = sol_petsc_to_native(sol)
+sol_native = petsc_to_native(sol)
 
 println(io0(), "Solution computed successfully!")
 println(io0(), "Iterations: ", length(sol_native.log))
@@ -369,7 +369,7 @@ sol = amgb(g;
     maxit=100)       # Maximum iterations
 
 # Convert solution back to native types
-sol_native = sol_petsc_to_native(sol)
+sol_native = petsc_to_native(sol)
 ```
 
 ### 3D Parameters
@@ -393,7 +393,7 @@ MultiGridBarrierPETSc.Init()
 
 # Solve with PETSc (distributed)
 sol_petsc = fem3d_petsc_solve(Float64; L=2, k=2, p=1.0, verbose=false)
-z_petsc = sol_petsc_to_native(sol_petsc).z
+z_petsc = petsc_to_native(sol_petsc).z
 
 # Solve with native (sequential)
 sol_native = MultiGridBarrier3d.fem3d_solve(Float64; L=2, k=2, p=1.0, verbose=false)

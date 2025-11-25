@@ -41,18 +41,11 @@ fem3d_petsc_solve
 ## Type Conversion API
 
 These functions convert between native Julia types and PETSc distributed types.
-
-### Geometry Conversion
-
-```@docs
-geometry_native_to_petsc
-geometry_petsc_to_native
-```
-
-### Solution Conversion
+The `petsc_to_native` function dispatches on type, handling both `Geometry` and `AMGBSOL` objects.
 
 ```@docs
-sol_petsc_to_native
+native_to_petsc
+petsc_to_native
 ```
 
 ## Type Mappings Reference
@@ -169,14 +162,14 @@ MultiGridBarrierPETSc.Init()
 g_native = fem2d(; maxh=0.3)
 
 # Convert to PETSc
-g_petsc = geometry_native_to_petsc(g_native)
+g_petsc = native_to_petsc(g_native)
 
 # Solve with PETSc types
 sol_petsc = amgb(g_petsc; p=2.0)
 
 # Convert back to native
-sol_native = sol_petsc_to_native(sol_petsc)
-g_back = geometry_petsc_to_native(g_petsc)
+sol_native = petsc_to_native(sol_petsc)
+g_back = petsc_to_native(g_petsc)
 
 # Verify round-trip accuracy
 @assert norm(g_native.x - g_back.x) < 1e-10
@@ -191,7 +184,7 @@ g_native = fem2d(; maxh=0.2)
 lap_native = g_native.operators[:laplacian]  # SparseMatrixCSC
 
 # PETSc geometry
-g_petsc = geometry_native_to_petsc(g_native)
+g_petsc = native_to_petsc(g_native)
 lap_petsc = g_petsc.operators[:laplacian]  # Mat{Float64, MPIAIJ}
 
 # Convert back if needed

@@ -30,7 +30,7 @@ MultiGridBarrierPETSc.Init()
 sol_petsc = fem2d_petsc_solve(Float64; L=3, p=1.0, verbose=false)
 
 # Convert to native types for visualization
-sol_native = sol_petsc_to_native(sol_petsc)
+sol_native = petsc_to_native(sol_petsc)
 
 # Only rank 0 creates the plot
 rank = MPI.Comm_rank(MPI.COMM_WORLD)

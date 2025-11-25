@@ -12,9 +12,8 @@ distributed types through SafePETSc.
 - `fem2d_petsc_solve`: Solves a fem2d problem using amgb with PETSc types
 - `fem3d_petsc`: Creates a PETSc-based Geometry from fem3d parameters
 - `fem3d_petsc_solve`: Solves a fem3d problem using amgb with PETSc types
-- `geometry_native_to_petsc`: Converts native Geometry to PETSc distributed types
-- `geometry_petsc_to_native`: Converts PETSc Geometry back to native Julia types
-- `sol_petsc_to_native`: Converts AMGBSOL with PETSc types to native Julia types
+- `native_to_petsc`: Converts native Geometry to PETSc distributed types
+- `petsc_to_native`: Converts PETSc Geometry or AMGBSOL back to native Julia types
 
 # Usage
 ```julia
@@ -34,7 +33,7 @@ g3d = fem3d_petsc(Float64; L=2, k=3)
 sol3d = fem3d_petsc_solve(Float64; L=2, k=3, p=1.0, verbose=true)
 
 # Convert solution back to native types for analysis
-sol_native = sol_petsc_to_native(sol)
+sol_native = petsc_to_native(sol)
 ```
 """
 module MultiGridBarrierPETSc
@@ -103,11 +102,11 @@ function Base.maximum(v::Vec{T}) where {T}
 end
 
 # ============================================================================
-# Geometry Conversion
+# Type Conversion
 # ============================================================================
 
 """
-    geometry_native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, SparseMatrixCSC{T,Int}, Discretization}) where {T, Discretization}
+    native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, SparseMatrixCSC{T,Int}, Discretization}) where {T, Discretization}
 
 **Collective**
 
@@ -123,7 +122,7 @@ geometry, then this function converts:
 The MPIDENSE prefix indicates dense storage (for geometry data and weights),
 while MPIAIJ indicates sparse storage (for operators and subspace matrices).
 """
-function geometry_native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, SparseMatrixCSC{T,Int}, Discretization}) where {T, Discretization}
+function native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, SparseMatrixCSC{T,Int}, Discretization}) where {T, Discretization}
     # Convert x (geometry coordinates) to MPIDENSE Mat
     x_petsc = SafePETSc.Mat_uniform(g_native.x; Prefix=MPIDENSE)
 
@@ -195,7 +194,7 @@ function geometry_native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, Sp
 end
 
 """
-    geometry_petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T,WPrefix}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, WPrefix, MPrefix, Discretization}
+    petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T,WPrefix}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, WPrefix, MPrefix, Discretization}
 
 **Collective**
 
@@ -209,7 +208,7 @@ This is a collective operation. This function converts:
 
 Uses SafePETSc.J() which automatically handles dense vs sparse conversion based on the Mat's storage type.
 """
-function geometry_petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T,WPrefix}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, WPrefix, MPrefix, Discretization}
+function petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T,WPrefix}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, WPrefix, MPrefix, Discretization}
     # Convert x (geometry coordinates) from MPIDENSE Mat to Matrix
     x_native = SafePETSc.J(g_petsc.x)
 
@@ -260,7 +259,7 @@ function geometry_petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T,WPr
 end
 
 """
-    sol_petsc_to_native(sol_petsc::AMGBSOL{T, Mat{T,XPrefix}, Vec{T,WPrefix}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, WPrefix, MPrefix, Discretization}
+    petsc_to_native(sol_petsc::AMGBSOL{T, XType, WType, MType, Discretization}) where {T, XType, WType, MType, Discretization}
 
 **Collective**
 
@@ -274,7 +273,7 @@ This is a collective operation that performs a deep conversion of the solution s
 
 Uses SafePETSc.J() which automatically handles dense vs sparse conversion based on the Mat's storage type.
 """
-function sol_petsc_to_native(sol_petsc::AMGBSOL{T, XType, WType, MType, Discretization}) where {T, XType, WType, MType, Discretization}
+function petsc_to_native(sol_petsc::AMGBSOL{T, XType, WType, MType, Discretization}) where {T, XType, WType, MType, Discretization}
     # Convert z using J - handles both Mat and Vec types
     z_native = SafePETSc.J(sol_petsc.z)
 
@@ -310,7 +309,7 @@ function sol_petsc_to_native(sol_petsc::AMGBSOL{T, XType, WType, MType, Discreti
     SOL_main_native = convert_namedtuple(sol_petsc.SOL_main)
 
     # Convert the geometry
-    geometry_native = geometry_petsc_to_native(sol_petsc.geometry)
+    geometry_native = petsc_to_native(sol_petsc.geometry)
 
     # Determine native types
     ZType = typeof(z_native)
@@ -417,7 +416,7 @@ function fem1d_petsc(::Type{T}=Float64; kwargs...) where {T}
     g_native = fem1d(T; kwargs...)
 
     # Convert to PETSc types
-    return geometry_native_to_petsc(g_native)
+    return native_to_petsc(g_native)
 end
 
 """
@@ -485,7 +484,7 @@ function fem2d_petsc(::Type{T}=Float64; kwargs...) where {T}
     g_native = fem2d(; kwargs...)
 
     # Convert to PETSc types
-    return geometry_native_to_petsc(g_native)
+    return native_to_petsc(g_native)
 end
 
 """
@@ -556,7 +555,7 @@ function fem3d_petsc(::Type{T}=Float64; kwargs...) where {T}
     g_native = fem3d(T; kwargs...)
 
     # Convert to PETSc types
-    return geometry_native_to_petsc(g_native)
+    return native_to_petsc(g_native)
 end
 
 """
@@ -607,6 +606,6 @@ export Init
 export fem1d_petsc, fem1d_petsc_solve
 export fem2d_petsc, fem2d_petsc_solve
 export fem3d_petsc, fem3d_petsc_solve
-export geometry_native_to_petsc, geometry_petsc_to_native, sol_petsc_to_native
+export native_to_petsc, petsc_to_native
 
 end # module MultiGridBarrierPETSc
