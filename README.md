@@ -77,7 +77,7 @@ julia --project=. -e 'using Pkg; Pkg.test()'
 | Native Julia Type | PETSc Distributed Type | Storage |
 |-------------------|------------------------|---------|
 | `Matrix{T}` | `Mat{T, MPIDENSE}` | Dense distributed |
-| `Vector{T}` | `Vec{T, MPIDENSE}` | Dense distributed |
+| `Vector{T}` | `Vec{T}` | Dense distributed |
 | `SparseMatrixCSC{T,Int}` | `Mat{T, MPIAIJ}` | Sparse distributed |
 
 ## Package Ecosystem

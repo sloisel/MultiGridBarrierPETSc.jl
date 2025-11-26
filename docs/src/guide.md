@@ -102,7 +102,7 @@ g_petsc = native_to_petsc(g_native)
 | Native Type | PETSc Type | Storage |
 |-------------|------------|---------|
 | `Matrix{T}` | `Mat{T, MPIDENSE}` | Dense distributed |
-| `Vector{T}` | `Vec{T, MPIDENSE}` | Dense distributed |
+| `Vector{T}` | `Vec{T}` | Dense distributed |
 | `SparseMatrixCSC{T,Int}` | `Mat{T, MPIAIJ}` | Sparse distributed |
 
 ### PETSc to Native

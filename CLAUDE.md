@@ -67,7 +67,7 @@ end
 ### Critical Type Mappings
 - Native `Matrix{T}` → `Mat{T, MPIDENSE}` (dense distributed)
 - Native `SparseMatrixCSC{T}` → `Mat{T, MPIAIJ}` (sparse distributed)
-- Native `Vector{T}` → `Vec{T, MPIDENSE}` (distributed vector)
+- Native `Vector{T}` → `Vec{T}` (distributed vector)
 - Geometry fields maintain consistent PETSc types after conversion
 
 ### Dependencies
@@ -100,7 +100,7 @@ using MultiGridBarrierPETSc
 
 ### IO
 
-Use io0() from SafePETSc to print or otherwise perform io from a single rank. It can be used as follows: `println(io0(),"Hello from rank 0!"). The Vec{T,Prefix} and Mat{T,Prefix} implement `show(...)` methods, but these are collective. Therefore, you can do `println(io0(),A)` and it will print the Vec or Mat once on rank 0.
+Use io0() from SafePETSc to print or otherwise perform io from a single rank. It can be used as follows: `println(io0(),"Hello from rank 0!")`. The Vec{T} and Mat{T,Prefix} implement `show(...)` methods, but these are collective. Therefore, you can do `println(io0(),A)` and it will print the Vec or Mat once on rank 0.
 
 ## Directory structure
 - Source files for the library are in src/

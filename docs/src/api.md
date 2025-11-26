@@ -57,7 +57,7 @@ When converting from native Julia types to PETSc distributed types:
 | Native Type | PETSc Type | PETSc Prefix | Usage |
 |-------------|------------|--------------|-------|
 | `Matrix{T}` | `Mat{T, MPIDENSE}` | MPIDENSE | Geometry coordinates, dense operators |
-| `Vector{T}` | `Vec{T, MPIDENSE}` | MPIDENSE | Weights, dense vectors |
+| `Vector{T}` | `Vec{T}` | - | Weights, dense vectors |
 | `SparseMatrixCSC{T,Int}` | `Mat{T, MPIAIJ}` | MPIAIJ | Sparse operators, subspace matrices |
 
 ### PETSc to Native Conversions
@@ -68,7 +68,7 @@ When converting from PETSc distributed types back to native Julia types:
 |------------|-------------|-------------------|
 | `Mat{T, MPIDENSE}` | `Matrix{T}` | `SafePETSc.J()` |
 | `Mat{T, MPIAIJ}` | `SparseMatrixCSC{T,Int}` | `SafePETSc.J()` |
-| `Vec{T, MPIDENSE}` | `Vector{T}` | `SafePETSc.J()` |
+| `Vec{T}` | `Vector{T}` | `SafePETSc.J()` |
 
 ## Geometry Structure
 
@@ -81,7 +81,7 @@ Geometry{T, Matrix{T}, Vector{T}, SparseMatrixCSC{T,Int}, Discretization}
 
 **PETSc Geometry:**
 ```julia
-Geometry{T, Mat{T,MPIDENSE}, Vec{T,MPIDENSE}, Mat{T,MPIAIJ}, Discretization}
+Geometry{T, Mat{T,MPIDENSE}, Vec{T}, Mat{T,MPIAIJ}, Discretization}
 ```
 
 ### Fields
