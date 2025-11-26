@@ -2,43 +2,16 @@
 
 ## Prerequisites
 
-### 1. MPI Installation
+### MPI and PETSc
 
-MultiGridBarrierPETSc.jl requires an MPI implementation. Install one of the following:
+**For most users, no manual installation is required.** When you install MultiGridBarrierPETSc.jl, Julia automatically provides:
+- `MPI.jl` with `MPI_jll` (bundled MPI implementation)
+- `PETSc.jl` with `PETSc_jll` (precompiled PETSc binary)
 
-**macOS (Homebrew):**
-```bash
-brew install open-mpi
-```
+This works out of the box on most systems.
 
-**Ubuntu/Debian:**
-```bash
-sudo apt-get install libopenmpi-dev
-```
-
-**Fedora/RHEL:**
-```bash
-sudo dnf install openmpi-devel
-```
-
-**Verify MPI installation:**
-```bash
-mpiexec --version
-```
-
-### 2. PETSc with MUMPS
-
-MultiGridBarrierPETSc.jl requires PETSc compiled with MUMPS support for direct solver functionality.
-
-**Default Installation (Most Users)**
-
-When you install MultiGridBarrierPETSc.jl, it automatically installs:
-- `PETSc.jl` (Julia wrapper)
-- `PETSc_jll.jl` (precompiled PETSc binary)
-
-**The `PETSc_jll` binary may or may not include MUMPS depending on your platform.** It is known to include MUMPS on macOS, but may not on some Linux distributions (e.g., GitHub Actions Ubuntu runners).
-
-If the default binary doesn't include MUMPS, you'll need to configure a custom PETSc build (see below).
+!!! note "MUMPS Support"
+    MultiGridBarrierPETSc.jl uses the MUMPS direct solver. The bundled `PETSc_jll` includes MUMPS on macOS, but may not on some Linux distributions. If you encounter solver errors, you may need a custom PETSc build (see below).
 
 **HPC and Custom Builds**
 
@@ -159,17 +132,13 @@ This uses `MPI.mpiexec()` to get the correct MPI launcher configured for your Ju
 
 ## Troubleshooting
 
-### MPI Not Found
+### MPI Issues
 
-If you see `ERROR: MPI not properly initialized`:
+If you see MPI-related errors, try rebuilding MPI.jl:
 
-1. Verify MPI is installed: `mpiexec --version`
-2. Rebuild MPI.jl: `julia -e 'using Pkg; Pkg.build("MPI")'`
-3. Set MPI binary explicitly:
-   ```julia
-   ENV["JULIA_MPI_BINARY"] = "system"
-   using Pkg; Pkg.build("MPI")
-   ```
+```julia
+using Pkg; Pkg.build("MPI")
+```
 
 ### PETSc/MUMPS Issues
 

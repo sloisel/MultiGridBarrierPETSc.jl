@@ -44,7 +44,7 @@ sol_petsc = fem2d_petsc_solve(Float64; L=L, maxh=maxh, p=p, verbose=true)
 
 # Convert solution to native Julia types (collective operation)
 println(io0(), "\nConverting solution to native types...")
-sol_native = sol_petsc_to_native(sol_petsc)
+sol_native = petsc_to_native(sol_petsc)
 
 # Display results (only on rank 0)
 println(io0(), "")
@@ -57,12 +57,9 @@ z_size = size(sol_native.z)
 println(io0(), "Solution matrix size: $(z_size[1]) × $(z_size[2])")
 
 # Convergence information
-n_iters = length(sol_native.log)
-println(io0(), "Number of iterations: $n_iters")
-
-# Objective value
-obj_value = sol_native.SOL_main.objective
-println(io0(), "Final objective value: $obj_value")
+n_newton_steps = sum(sol_native.SOL_main.its)
+println(io0(), "Total Newton steps: $n_newton_steps")
+println(io0(), "Elapsed time: $(sol_native.SOL_main.t_elapsed) seconds")
 
 # Solution statistics
 z_norm = norm(sol_native.z)
@@ -70,12 +67,6 @@ z_min = minimum(sol_native.z)
 z_max = maximum(sol_native.z)
 println(io0(), "Solution norm: $z_norm")
 println(io0(), "Solution range: [$z_min, $z_max]")
-
-# Residuals
-primal_res = sol_native.SOL_main.primal_residual
-dual_res = sol_native.SOL_main.dual_residual
-println(io0(), "Primal residual: $primal_res")
-println(io0(), "Dual residual:   $dual_res")
 
 println(io0(), "")
 println(io0(), "="^70)

@@ -348,7 +348,7 @@ The default options configure MPIAIJ (sparse) matrices to use:
 - `-pc_type lu`: Use LU factorization as preconditioner
 - `-pc_factor_mat_solver_type mumps`: Use MUMPS sparse direct solver for the factorization
 
-Dense matrices (MPIDENSE) use PETSc's default dense LU solver.
+Note: MPIDENSE matrices are only used for geometry data (coordinates and weights), not for linear solves.
 
 # Arguments
 - `options::String`: PETSc options string to set (default: MUMPS direct solver for sparse matrices)

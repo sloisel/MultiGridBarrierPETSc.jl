@@ -153,8 +153,8 @@ sol_petsc = amgb(g_petsc;
 sol_native = petsc_to_native(sol_petsc)
 
 # 5. Access solution components
-println(io0(), "Objective value: ", sol_native.SOL_main.objective)
-println(io0(), "Iterations: ", length(sol_native.log))
+println(io0(), "Newton steps: ", sum(sol_native.SOL_main.its))
+println(io0(), "Elapsed time: ", sol_native.SOL_main.t_elapsed, " seconds")
 ```
 
 ### Comparing PETSc vs Native Solutions
@@ -233,7 +233,7 @@ The MUMPS sparse direct solver is configured automatically during `Init()`:
 MultiGridBarrierPETSc.Init()  # Prints "Initializing MultiGridBarrierPETSc with solver options..."
 ```
 
-MUMPS provides exact sparse direct solves for MPIAIJ (sparse) matrices, ensuring accurate Newton iterations in the barrier method. Dense matrices (MPIDENSE) use PETSc's default dense LU solver.
+MUMPS provides exact sparse direct solves for MPIAIJ (sparse) matrices, ensuring accurate Newton iterations in the barrier method.
 
 ## Common Patterns
 
@@ -249,11 +249,11 @@ sol_native = petsc_to_native(sol)
 
 # Access solution data
 z = sol_native.z  # Solution matrix
-obj = sol_native.SOL_main.objective  # Objective function value
-iters = length(sol_native.log)  # Number of iterations
+iters = sum(sol_native.SOL_main.its)  # Total Newton steps
+elapsed = sol_native.SOL_main.t_elapsed  # Elapsed time in seconds
 
 println(io0(), "Converged in $iters iterations")
-println(io0(), "Final objective: $obj")
+println(io0(), "Elapsed time: $elapsed seconds")
 ```
 
 ## 1D Problems
@@ -274,7 +274,7 @@ sol = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=true)
 sol_native = petsc_to_native(sol)
 
 println(io0(), "Solution computed successfully!")
-println(io0(), "Iterations: ", length(sol_native.log))
+println(io0(), "Newton steps: ", sum(sol_native.SOL_main.its))
 ```
 
 ### 1D Geometry Creation
@@ -347,7 +347,7 @@ sol = fem3d_petsc_solve(Float64; L=2, k=3, p=1.0, verbose=true)
 sol_native = petsc_to_native(sol)
 
 println(io0(), "Solution computed successfully!")
-println(io0(), "Iterations: ", length(sol_native.log))
+println(io0(), "Newton steps: ", sum(sol_native.SOL_main.its))
 ```
 
 ### 3D Geometry Creation

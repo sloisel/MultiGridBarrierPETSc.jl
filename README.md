@@ -20,7 +20,7 @@ sol = fem2d_petsc_solve(Float64; L=3, p=1.0, verbose=false)
 
 # Convert to native types for plotting
 using MultiGridBarrier
-sol_native = sol_petsc_to_native(sol)
+sol_native = petsc_to_native(sol)
 plot(sol_native)
 ```
 

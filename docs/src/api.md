@@ -103,9 +103,10 @@ The `AMGBSOL` type from MultiGridBarrier contains the complete solution:
 - **`z`**: Solution matrix/vector
 - **`SOL_feasibility`**: NamedTuple with feasibility phase information
 - **`SOL_main`**: NamedTuple with main solve information
-  - `objective`: Final objective function value
-  - `primal_residual`: Primal feasibility residual
-  - `dual_residual`: Dual feasibility residual
+  - `t_elapsed`: Elapsed solve time in seconds
+  - `ts`: Barrier parameter values
+  - `its`: Iterations per level
+  - `c_dot_Dz`: Convergence measure values
 - **`log`**: Vector of iteration logs
 - **`geometry`**: The geometry used for solving
 
@@ -144,9 +145,9 @@ The `Init()` function automatically configures PETSc to use MUMPS for sparse mat
 
 **Matrix Type Configuration:**
 - **Sparse matrices (MPIAIJ)**: Use MUMPS direct solver for exact solves
-- **Dense matrices (MPIDENSE)**: Use PETSc's default dense LU solver
+- **Dense matrices (MPIDENSE)**: Used only for geometry data (coordinates and weights), not for linear solves
 
-This ensures exact direct solves for linear systems in the barrier method's Newton iterations.
+This ensures exact direct solves for the sparse linear systems in the barrier method's Newton iterations.
 
 ## Examples
 

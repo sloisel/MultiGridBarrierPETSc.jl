@@ -34,7 +34,7 @@ The main module (`src/MultiGridBarrierPETSc.jl`) has three primary responsibilit
    - `amgb_zeros`, `amgb_all_isfinite`, `amgb_hcat`, `amgb_diag`, `amgb_blockdiag`, `map_rows`
    - Dispatches based on Mat/Vec storage type (MPIAIJ for sparse, MPIDENSE for dense)
 
-2. **Geometry Conversion (lines 97-180)**: `geometry_native_to_petsc()` converts native Julia arrays to PETSc distributed types
+2. **Geometry Conversion (lines 97-180)**: `native_to_petsc()` converts native Julia arrays to PETSc distributed types
    - Coordinates (x) and weights (w) → MPIDENSE storage
    - Operators and subspace matrices → MPIAIJ sparse storage
    - Preserves multigrid hierarchy (refine/coarsen matrices)
