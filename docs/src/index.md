@@ -1,4 +1,14 @@
-# MultiGridBarrierPETSc.jl
+```@meta
+CurrentModule = MultiGridBarrierPETSc
+```
+
+```@eval
+using Markdown
+using Pkg
+using MultiGridBarrierPETSc
+v = string(pkgversion(MultiGridBarrierPETSc))
+md"# MultiGridBarrierPETSc.jl $v"
+```
 
 **A Julia package that bridges MultiGridBarrier.jl and SafePETSc.jl for distributed multigrid barrier computations.**
 

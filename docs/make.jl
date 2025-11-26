@@ -1,10 +1,14 @@
 using Documenter
 using MultiGridBarrierPETSc
+using Pkg
+
+# Compute version dynamically
+version = string(pkgversion(MultiGridBarrierPETSc))
 
 makedocs(;
     modules=[MultiGridBarrierPETSc],
     authors="Sebastien Loisel and contributors",
-    sitename="MultiGridBarrierPETSc.jl",
+    sitename="MultiGridBarrierPETSc.jl $version",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://sloisel.github.io/MultiGridBarrierPETSc.jl",
