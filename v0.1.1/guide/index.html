@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>User Guide · MultiGridBarrierPETSc.jl</title><meta name="title" content="User Guide · MultiGridBarrierPETSc.jl"/><meta property="og:title" content="User Guide · MultiGridBarrierPETSc.jl"/><meta property="twitter:title" content="User Guide · MultiGridBarrierPETSc.jl"/><meta name="description" content="Documentation for MultiGridBarrierPETSc.jl."/><meta property="og:description" content="Documentation for MultiGridBarrierPETSc.jl."/><meta property="twitter:description" content="Documentation for MultiGridBarrierPETSc.jl."/><meta property="og:url" content="https://sloisel.github.io/MultiGridBarrierPETSc.jl/guide/"/><meta property="twitter:url" content="https://sloisel.github.io/MultiGridBarrierPETSc.jl/guide/"/><link rel="canonical" href="https://sloisel.github.io/MultiGridBarrierPETSc.jl/guide/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">MultiGridBarrierPETSc.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../installation/">Installation</a></li><li class="is-active"><a class="tocitem" href>User Guide</a><ul class="internal"><li><a class="tocitem" href="#Initialization"><span>Initialization</span></a></li><li><a class="tocitem" href="#Basic-Workflow"><span>Basic Workflow</span></a></li><li><a class="tocitem" href="#Understanding-MPI-Collective-Operations"><span>Understanding MPI Collective Operations</span></a></li><li><a class="tocitem" href="#Type-Conversions"><span>Type Conversions</span></a></li><li><a class="tocitem" href="#Advanced-Usage"><span>Advanced Usage</span></a></li><li><a class="tocitem" href="#IO-and-Output"><span>IO and Output</span></a></li><li><a class="tocitem" href="#Performance-Considerations"><span>Performance Considerations</span></a></li><li><a class="tocitem" href="#Common-Patterns"><span>Common Patterns</span></a></li><li><a class="tocitem" href="#1D-Problems"><span>1D Problems</span></a></li><li><a class="tocitem" href="#3D-Problems"><span>3D Problems</span></a></li><li><a class="tocitem" href="#Next-Steps"><span>Next Steps</span></a></li></ul></li><li><a class="tocitem" href="../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>User Guide</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>User Guide</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/sloisel/MultiGridBarrierPETSc.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/sloisel/MultiGridBarrierPETSc.jl/blob/main/docs/src/guide.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="User-Guide"><a class="docs-heading-anchor" href="#User-Guide">User Guide</a><a id="User-Guide-1"></a><a class="docs-heading-anchor-permalink" href="#User-Guide" title="Permalink"></a></h1><p>This guide covers the essential workflows for using MultiGridBarrierPETSc.jl.</p><h2 id="Initialization"><a class="docs-heading-anchor" href="#Initialization">Initialization</a><a id="Initialization-1"></a><a class="docs-heading-anchor-permalink" href="#Initialization" title="Permalink"></a></h2><p>Every program using MultiGridBarrierPETSc.jl must initialize the package before calling any functions:</p><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+MultiGridBarrierPETSc.Init()  # Initialize MPI and PETSc before calling functions</code></pre><p>The <code>Init()</code> function:</p><ul><li>Initializes MPI and PETSc if not already initialized</li><li>Configures MUMPS sparse direct solver for accurate linear solves</li><li>Only needs to be called once at the start of your program</li></ul><h2 id="Basic-Workflow"><a class="docs-heading-anchor" href="#Basic-Workflow">Basic Workflow</a><a id="Basic-Workflow-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Workflow" title="Permalink"></a></h2><p>The typical workflow consists of three steps:</p><ol><li><strong>Solve with PETSc types</strong> (distributed computation)</li><li><strong>Convert to native types</strong> (for analysis/plotting)</li><li><strong>Visualize or analyze</strong> (using MultiGridBarrier&#39;s tools)</li></ol><h3 id="Complete-Example-with-Visualization"><a class="docs-heading-anchor" href="#Complete-Example-with-Visualization">Complete Example with Visualization</a><a id="Complete-Example-with-Visualization-1"></a><a class="docs-heading-anchor-permalink" href="#Complete-Example-with-Visualization" title="Permalink"></a></h3><p>Here&#39;s a complete example that solves a 2D FEM problem, converts the solution, and plots it:</p><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using MultiGridBarrier
+using PyPlot
+MultiGridBarrierPETSc.Init()
+
+# Step 1: Solve with PETSc distributed types (L=3 for fast documentation builds)
+sol_petsc = fem2d_petsc_solve(Float64; L=3, p=1.0, verbose=false)
+
+# Step 2: Convert solution to native Julia types
+sol_native = petsc_to_native(sol_petsc)
+
+# Step 3: Plot the solution using MultiGridBarrier&#39;s plot function
+figure(figsize=(10, 8))
+plot(sol_native)
+title(&quot;Multigrid Barrier Solution (L=3)&quot;)
+tight_layout()
+savefig(&quot;solution_plot.png&quot;)
+println(io0(), &quot;Solution plotted!&quot;)</code></pre><div class="admonition is-success" id="Running-This-Example-9573b4619a8b6520"><header class="admonition-header">Running This Example<a class="admonition-anchor" href="#Running-This-Example-9573b4619a8b6520" title="Permalink"></a></header><div class="admonition-body"><p>Save this code to a file (e.g., <code>visualize.jl</code>) and run with:</p><pre><code class="language-bash hljs">julia -e &#39;using MPI; run(`$(MPI.mpiexec()) -n 4 $(Base.julia_cmd()) visualize.jl`)&#39;</code></pre><p>This uses <code>MPI.mpiexec()</code> to get the correct MPI launcher configured for your Julia installation, avoiding compatibility issues with system <code>mpiexec</code>. Add <code>--project</code> or other Julia options as needed for your environment.</p><p>This will create <code>solution_plot.png</code> showing the computed solution.</p></div></div><h2 id="Understanding-MPI-Collective-Operations"><a class="docs-heading-anchor" href="#Understanding-MPI-Collective-Operations">Understanding MPI Collective Operations</a><a id="Understanding-MPI-Collective-Operations-1"></a><a class="docs-heading-anchor-permalink" href="#Understanding-MPI-Collective-Operations" title="Permalink"></a></h2><div class="admonition is-warning" id="All-Functions-Are-Collective-fd9bd0a42a31a2f5"><header class="admonition-header">All Functions Are Collective<a class="admonition-anchor" href="#All-Functions-Are-Collective-fd9bd0a42a31a2f5" title="Permalink"></a></header><div class="admonition-body"><p>All exported functions in MultiGridBarrierPETSc.jl are <strong>MPI collective operations</strong>. This means:</p><ul><li>All MPI ranks must call the function</li><li>All ranks must call it with the same parameters</li><li>Deadlock will occur if only some ranks call a collective function</li></ul></div></div><p><strong>Correct usage:</strong></p><pre><code class="language-julia hljs"># All ranks execute this together
+sol = fem2d_petsc_solve(Float64; L=2, p=1.0)</code></pre><p><strong>Incorrect usage (causes deadlock):</strong></p><pre><code class="language-julia hljs">rank = MPI.Comm_rank(MPI.COMM_WORLD)
+if rank == 0
+    sol = fem2d_petsc_solve(Float64; L=2, p=1.0)  # ✗ Only rank 0 calls - DEADLOCK!
+end</code></pre><h2 id="Type-Conversions"><a class="docs-heading-anchor" href="#Type-Conversions">Type Conversions</a><a id="Type-Conversions-1"></a><a class="docs-heading-anchor-permalink" href="#Type-Conversions" title="Permalink"></a></h2><h3 id="Native-to-PETSc"><a class="docs-heading-anchor" href="#Native-to-PETSc">Native to PETSc</a><a id="Native-to-PETSc-1"></a><a class="docs-heading-anchor-permalink" href="#Native-to-PETSc" title="Permalink"></a></h3><p>Convert native Julia arrays to PETSc distributed types:</p><pre><code class="language-julia hljs">using MultiGridBarrier
+
+# Create native geometry
+g_native = fem2d(; maxh=0.3)
+
+# Convert to PETSc types for distributed computation
+g_petsc = native_to_petsc(g_native)</code></pre><p><strong>Type mappings:</strong></p><table><tr><th style="text-align: right">Native Type</th><th style="text-align: right">PETSc Type</th><th style="text-align: right">Storage</th></tr><tr><td style="text-align: right"><code>Matrix{T}</code></td><td style="text-align: right"><code>Mat{T, MPIDENSE}</code></td><td style="text-align: right">Dense distributed</td></tr><tr><td style="text-align: right"><code>Vector{T}</code></td><td style="text-align: right"><code>Vec{T, MPIDENSE}</code></td><td style="text-align: right">Dense distributed</td></tr><tr><td style="text-align: right"><code>SparseMatrixCSC{T,Int}</code></td><td style="text-align: right"><code>Mat{T, MPIAIJ}</code></td><td style="text-align: right">Sparse distributed</td></tr></table><h3 id="PETSc-to-Native"><a class="docs-heading-anchor" href="#PETSc-to-Native">PETSc to Native</a><a id="PETSc-to-Native-1"></a><a class="docs-heading-anchor-permalink" href="#PETSc-to-Native" title="Permalink"></a></h3><p>Convert PETSc types back to native Julia arrays:</p><pre><code class="language-julia hljs"># Create and solve with PETSc types
+g_petsc = fem2d_petsc(Float64; maxh=0.3)
+sol_petsc = amgb(g_petsc; p=2.0)
+
+# Convert back for analysis
+g_native = petsc_to_native(g_petsc)
+sol_native = petsc_to_native(sol_petsc)
+
+# Now you can use native Julia operations
+using LinearAlgebra
+z_matrix = sol_native.z
+solution_norm = norm(z_matrix)
+println(io0(), &quot;Solution norm: &quot;, solution_norm)</code></pre><h2 id="Advanced-Usage"><a class="docs-heading-anchor" href="#Advanced-Usage">Advanced Usage</a><a id="Advanced-Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Advanced-Usage" title="Permalink"></a></h2><h3 id="Custom-Geometry-Workflow"><a class="docs-heading-anchor" href="#Custom-Geometry-Workflow">Custom Geometry Workflow</a><a id="Custom-Geometry-Workflow-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-Geometry-Workflow" title="Permalink"></a></h3><p>For more control, construct geometries manually:</p><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using MultiGridBarrier
+MultiGridBarrierPETSc.Init()
+
+# 1. Create native geometry with specific parameters
+g_native = fem2d(; maxh=0.2, L=2)
+
+# 2. Convert to PETSc for distributed solving
+g_petsc = native_to_petsc(g_native)
+
+# 3. Solve with custom barrier parameters
+sol_petsc = amgb(g_petsc;
+    p=1.5,           # Barrier power parameter
+    verbose=true,    # Print convergence info
+    maxit=100,       # Maximum iterations
+    tol=1e-8)        # Convergence tolerance
+
+# 4. Convert solution back
+sol_native = petsc_to_native(sol_petsc)
+
+# 5. Access solution components
+println(io0(), &quot;Objective value: &quot;, sol_native.SOL_main.objective)
+println(io0(), &quot;Iterations: &quot;, length(sol_native.log))</code></pre><h3 id="Comparing-PETSc-vs-Native-Solutions"><a class="docs-heading-anchor" href="#Comparing-PETSc-vs-Native-Solutions">Comparing PETSc vs Native Solutions</a><a id="Comparing-PETSc-vs-Native-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Comparing-PETSc-vs-Native-Solutions" title="Permalink"></a></h3><p>Verify that PETSc and native implementations give the same results:</p><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using MultiGridBarrier
+using LinearAlgebra
+MultiGridBarrierPETSc.Init()
+
+# Solve with PETSc (distributed)
+sol_petsc_dist = fem2d_petsc_solve(Float64; L=2, p=1.0, verbose=false)
+z_petsc = petsc_to_native(sol_petsc_dist).z
+
+# Solve with native (sequential, on rank 0)
+rank = MPI.Comm_rank(MPI.COMM_WORLD)
+if rank == 0
+    sol_native = MultiGridBarrier.fem2d_solve(Float64; L=2, p=1.0, verbose=false)
+    z_native = sol_native.z
+
+    # Compare solutions
+    diff = norm(z_petsc - z_native) / norm(z_native)
+    println(&quot;Relative difference: &quot;, diff)
+    @assert diff &lt; 1e-10 &quot;Solutions should match!&quot;
+end</code></pre><h2 id="IO-and-Output"><a class="docs-heading-anchor" href="#IO-and-Output">IO and Output</a><a id="IO-and-Output-1"></a><a class="docs-heading-anchor-permalink" href="#IO-and-Output" title="Permalink"></a></h2><h3 id="Printing-from-One-Rank"><a class="docs-heading-anchor" href="#Printing-from-One-Rank">Printing from One Rank</a><a id="Printing-from-One-Rank-1"></a><a class="docs-heading-anchor-permalink" href="#Printing-from-One-Rank" title="Permalink"></a></h3><p>Use <code>io0()</code> to print from rank 0 only:</p><pre><code class="language-julia hljs">using SafePETSc
+
+# This prints once (from rank 0)
+println(io0(), &quot;Hello from rank 0!&quot;)
+
+# Without io0(), this prints from ALL ranks
+println(&quot;Hello from rank &quot;, MPI.Comm_rank(MPI.COMM_WORLD))</code></pre><h3 id="Displaying-PETSc-Types"><a class="docs-heading-anchor" href="#Displaying-PETSc-Types">Displaying PETSc Types</a><a id="Displaying-PETSc-Types-1"></a><a class="docs-heading-anchor-permalink" href="#Displaying-PETSc-Types" title="Permalink"></a></h3><p>PETSc Vec and Mat types implement <code>show()</code> methods, but these are collective:</p><pre><code class="language-julia hljs">using SafePETSc  # For io0()
+using MultiGridBarrierPETSc
+MultiGridBarrierPETSc.Init()
+
+g = fem2d_petsc(Float64; maxh=0.5)
+
+# Collective operation - all ranks participate
+println(io0(), g.w)  # Prints the Vec once on rank 0</code></pre><h2 id="Performance-Considerations"><a class="docs-heading-anchor" href="#Performance-Considerations">Performance Considerations</a><a id="Performance-Considerations-1"></a><a class="docs-heading-anchor-permalink" href="#Performance-Considerations" title="Permalink"></a></h2><h3 id="Mesh-Size-and-MPI-Ranks"><a class="docs-heading-anchor" href="#Mesh-Size-and-MPI-Ranks">Mesh Size and MPI Ranks</a><a id="Mesh-Size-and-MPI-Ranks-1"></a><a class="docs-heading-anchor-permalink" href="#Mesh-Size-and-MPI-Ranks" title="Permalink"></a></h3><p>For efficient parallel computation:</p><ul><li><strong>Small problems</strong> (L ≤ 3): Use 1-4 MPI ranks</li><li><strong>Medium problems</strong> (L = 4-5): Use 4-16 MPI ranks</li><li><strong>Large problems</strong> (L ≥ 6): Use 16+ MPI ranks</li></ul><h3 id="MUMPS-Solver-Configuration"><a class="docs-heading-anchor" href="#MUMPS-Solver-Configuration">MUMPS Solver Configuration</a><a id="MUMPS-Solver-Configuration-1"></a><a class="docs-heading-anchor-permalink" href="#MUMPS-Solver-Configuration" title="Permalink"></a></h3><p>The MUMPS sparse direct solver is configured automatically during <code>Init()</code>:</p><pre><code class="language-julia hljs">MultiGridBarrierPETSc.Init()  # Prints &quot;Initializing MultiGridBarrierPETSc with solver options...&quot;</code></pre><p>MUMPS provides exact sparse direct solves for MPIAIJ (sparse) matrices, ensuring accurate Newton iterations in the barrier method. Dense matrices (MPIDENSE) use PETSc&#39;s default dense LU solver.</p><h2 id="Common-Patterns"><a class="docs-heading-anchor" href="#Common-Patterns">Common Patterns</a><a id="Common-Patterns-1"></a><a class="docs-heading-anchor-permalink" href="#Common-Patterns" title="Permalink"></a></h2><h3 id="Solve-and-Extract-Specific-Values"><a class="docs-heading-anchor" href="#Solve-and-Extract-Specific-Values">Solve and Extract Specific Values</a><a id="Solve-and-Extract-Specific-Values-1"></a><a class="docs-heading-anchor-permalink" href="#Solve-and-Extract-Specific-Values" title="Permalink"></a></h3><pre><code class="language-julia hljs">using SafePETSc  # For io0()
+using MultiGridBarrierPETSc
+MultiGridBarrierPETSc.Init()
+
+sol = fem2d_petsc_solve(Float64; L=3, p=1.0)
+sol_native = petsc_to_native(sol)
+
+# Access solution data
+z = sol_native.z  # Solution matrix
+obj = sol_native.SOL_main.objective  # Objective function value
+iters = length(sol_native.log)  # Number of iterations
+
+println(io0(), &quot;Converged in $iters iterations&quot;)
+println(io0(), &quot;Final objective: $obj&quot;)</code></pre><h2 id="1D-Problems"><a class="docs-heading-anchor" href="#1D-Problems">1D Problems</a><a id="1D-Problems-1"></a><a class="docs-heading-anchor-permalink" href="#1D-Problems" title="Permalink"></a></h2><p>MultiGridBarrierPETSc supports 1D finite element problems through MultiGridBarrier.jl.</p><h3 id="Basic-1D-Example"><a class="docs-heading-anchor" href="#Basic-1D-Example">Basic 1D Example</a><a id="Basic-1D-Example-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-1D-Example" title="Permalink"></a></h3><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve a 1D problem with 4 multigrid levels (2^4 = 16 elements)
+sol = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=true)
+
+# Convert solution to native types for analysis
+sol_native = petsc_to_native(sol)
+
+println(io0(), &quot;Solution computed successfully!&quot;)
+println(io0(), &quot;Iterations: &quot;, length(sol_native.log))</code></pre><h3 id="1D-Geometry-Creation"><a class="docs-heading-anchor" href="#1D-Geometry-Creation">1D Geometry Creation</a><a id="1D-Geometry-Creation-1"></a><a class="docs-heading-anchor-permalink" href="#1D-Geometry-Creation" title="Permalink"></a></h3><p>For more control, create the geometry separately:</p><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using MultiGridBarrier
+MultiGridBarrierPETSc.Init()
+
+# Create 1D PETSc geometry
+g = fem1d_petsc(Float64; L=4)
+
+# Solve with custom parameters
+sol = amgb(g;
+    p=1.0,           # Barrier power parameter
+    verbose=true,    # Print convergence info
+    maxit=100)       # Maximum iterations
+
+# Convert solution back to native types
+sol_native = petsc_to_native(sol)</code></pre><h3 id="1D-Parameters"><a class="docs-heading-anchor" href="#1D-Parameters">1D Parameters</a><a id="1D-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#1D-Parameters" title="Permalink"></a></h3><p>The <code>fem1d_petsc</code> and <code>fem1d_petsc_solve</code> functions accept:</p><table><tr><th style="text-align: right">Parameter</th><th style="text-align: right">Description</th><th style="text-align: right">Default</th></tr><tr><td style="text-align: right"><code>L</code></td><td style="text-align: right">Number of multigrid levels (creates 2^L elements)</td><td style="text-align: right">4</td></tr></table><h3 id="Comparing-1D-PETSc-vs-Native-Solutions"><a class="docs-heading-anchor" href="#Comparing-1D-PETSc-vs-Native-Solutions">Comparing 1D PETSc vs Native Solutions</a><a id="Comparing-1D-PETSc-vs-Native-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Comparing-1D-PETSc-vs-Native-Solutions" title="Permalink"></a></h3><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using MultiGridBarrier
+using LinearAlgebra
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve with PETSc (distributed)
+sol_petsc = fem1d_petsc_solve(Float64; L=4, p=1.0, verbose=false)
+z_petsc = petsc_to_native(sol_petsc).z
+
+# Solve with native (sequential)
+sol_native = MultiGridBarrier.fem1d_solve(Float64; L=4, p=1.0, verbose=false)
+z_native = sol_native.z
+
+# Compare solutions
+diff = norm(z_petsc - z_native) / norm(z_native)
+println(io0(), &quot;Relative difference: &quot;, diff)</code></pre><h2 id="3D-Problems"><a class="docs-heading-anchor" href="#3D-Problems">3D Problems</a><a id="3D-Problems-1"></a><a class="docs-heading-anchor-permalink" href="#3D-Problems" title="Permalink"></a></h2><p>MultiGridBarrierPETSc also supports 3D hexahedral finite elements through MultiGridBarrier3d.jl.</p><h3 id="Basic-3D-Example"><a class="docs-heading-anchor" href="#Basic-3D-Example">Basic 3D Example</a><a id="Basic-3D-Example-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-3D-Example" title="Permalink"></a></h3><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve a 3D problem with Q3 elements and 2 multigrid levels
+sol = fem3d_petsc_solve(Float64; L=2, k=3, p=1.0, verbose=true)
+
+# Convert solution to native types for analysis
+sol_native = petsc_to_native(sol)
+
+println(io0(), &quot;Solution computed successfully!&quot;)
+println(io0(), &quot;Iterations: &quot;, length(sol_native.log))</code></pre><h3 id="3D-Geometry-Creation"><a class="docs-heading-anchor" href="#3D-Geometry-Creation">3D Geometry Creation</a><a id="3D-Geometry-Creation-1"></a><a class="docs-heading-anchor-permalink" href="#3D-Geometry-Creation" title="Permalink"></a></h3><p>For more control, create the geometry separately:</p><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using MultiGridBarrier
+MultiGridBarrierPETSc.Init()
+
+# Create 3D PETSc geometry
+g = fem3d_petsc(Float64; L=2, k=3)
+
+# Solve with custom parameters
+sol = amgb(g;
+    p=1.0,           # Barrier power parameter
+    verbose=true,    # Print convergence info
+    maxit=100)       # Maximum iterations
+
+# Convert solution back to native types
+sol_native = petsc_to_native(sol)</code></pre><h3 id="3D-Parameters"><a class="docs-heading-anchor" href="#3D-Parameters">3D Parameters</a><a id="3D-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#3D-Parameters" title="Permalink"></a></h3><p>The <code>fem3d_petsc</code> and <code>fem3d_petsc_solve</code> functions accept:</p><table><tr><th style="text-align: right">Parameter</th><th style="text-align: right">Description</th><th style="text-align: right">Default</th></tr><tr><td style="text-align: right"><code>L</code></td><td style="text-align: right">Number of multigrid levels</td><td style="text-align: right">2</td></tr><tr><td style="text-align: right"><code>k</code></td><td style="text-align: right">Polynomial order of elements (Q_k)</td><td style="text-align: right">3</td></tr><tr><td style="text-align: right"><code>K</code></td><td style="text-align: right">Coarse Q1 mesh (N×3 matrix, 8 vertices per hex)</td><td style="text-align: right">Unit cube [-1,1]³</td></tr></table><h3 id="Comparing-3D-PETSc-vs-Native-Solutions"><a class="docs-heading-anchor" href="#Comparing-3D-PETSc-vs-Native-Solutions">Comparing 3D PETSc vs Native Solutions</a><a id="Comparing-3D-PETSc-vs-Native-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Comparing-3D-PETSc-vs-Native-Solutions" title="Permalink"></a></h3><pre><code class="language-julia hljs">using MultiGridBarrierPETSc
+using MultiGridBarrier3d
+using LinearAlgebra
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Solve with PETSc (distributed)
+sol_petsc = fem3d_petsc_solve(Float64; L=2, k=2, p=1.0, verbose=false)
+z_petsc = petsc_to_native(sol_petsc).z
+
+# Solve with native (sequential)
+sol_native = MultiGridBarrier3d.fem3d_solve(Float64; L=2, k=2, p=1.0, verbose=false)
+z_native = sol_native.z
+
+# Compare solutions
+diff = norm(z_petsc - z_native) / norm(z_native)
+println(io0(), &quot;Relative difference: &quot;, diff)</code></pre><h2 id="Next-Steps"><a class="docs-heading-anchor" href="#Next-Steps">Next Steps</a><a id="Next-Steps-1"></a><a class="docs-heading-anchor-permalink" href="#Next-Steps" title="Permalink"></a></h2><ul><li>See the <a href="../api/#API-Reference">API Reference</a> for detailed function documentation</li><li>Check the <code>examples/</code> directory for complete runnable examples</li><li>Consult MultiGridBarrier.jl documentation for barrier method theory</li><li>Consult MultiGridBarrier3d.jl documentation for 3D FEM details</li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../installation/">« Installation</a><a class="docs-footer-nextpage" href="../api/">API Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Wednesday 26 November 2025 03:15">Wednesday 26 November 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
