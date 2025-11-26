@@ -115,7 +115,7 @@ Convert a native Geometry object (with Julia arrays) to use PETSc distributed ty
 This is a collective operation. Each rank calls fem2d() to get the same native
 geometry, then this function converts:
 - x::Matrix{T} -> x::Mat{T, MPIDENSE}
-- w::Vector{T} -> w::Vec{T, MPIDENSE}
+- w::Vector{T} -> w::Vec{T}
 - operators[key]::SparseMatrixCSC{T,Int} -> operators[key]::Mat{T, MPIAIJ}
 - subspaces[key][i]::SparseMatrixCSC{T,Int} -> subspaces[key][i]::Mat{T, MPIAIJ}
 
@@ -126,8 +126,8 @@ function native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, SparseMatri
     # Convert x (geometry coordinates) to MPIDENSE Mat
     x_petsc = SafePETSc.Mat_uniform(g_native.x; Prefix=MPIDENSE)
 
-    # Convert w (weights) to MPIDENSE Vec (weights are uniform/dense data)
-    w_petsc = SafePETSc.Vec_uniform(g_native.w; Prefix=MPIDENSE)
+    # Convert w (weights) to Vec (weights are uniform/dense data)
+    w_petsc = SafePETSc.Vec_uniform(g_native.w)
 
     # Convert all operators to MPIAIJ Mat
     # Mat_uniform distributes the uniform matrix across ranks as MPIAIJ (sparse, partitioned)
@@ -194,7 +194,7 @@ function native_to_petsc(g_native::Geometry{T, Matrix{T}, Vector{T}, SparseMatri
 end
 
 """
-    petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T,WPrefix}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, WPrefix, MPrefix, Discretization}
+    petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, MPrefix, Discretization}
 
 **Collective**
 
@@ -202,13 +202,13 @@ Convert a PETSc Geometry object (with distributed PETSc types) back to native Ju
 
 This is a collective operation. This function converts:
 - x::Mat{T, MPIDENSE} -> x::Matrix{T}
-- w::Vec{T, MPIDENSE} -> w::Vector{T}
+- w::Vec{T} -> w::Vector{T}
 - operators[key]::Mat{T, MPIAIJ} -> operators[key]::SparseMatrixCSC{T,Int}
 - subspaces[key][i]::Mat{T, MPIAIJ} -> subspaces[key][i]::SparseMatrixCSC{T,Int}
 
 Uses SafePETSc.J() which automatically handles dense vs sparse conversion based on the Mat's storage type.
 """
-function petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T,WPrefix}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, WPrefix, MPrefix, Discretization}
+function petsc_to_native(g_petsc::Geometry{T, Mat{T,XPrefix}, Vec{T}, Mat{T,MPrefix}, Discretization}) where {T, XPrefix, MPrefix, Discretization}
     # Convert x (geometry coordinates) from MPIDENSE Mat to Matrix
     x_native = SafePETSc.J(g_petsc.x)
 
@@ -266,7 +266,7 @@ end
 Convert an AMGBSOL solution object from PETSc types back to native Julia types.
 
 This is a collective operation that performs a deep conversion of the solution structure:
-- z: Mat{T,Prefix} -> Matrix{T} or Vec{T,Prefix} -> Vector{T} (depending on the type)
+- z: Mat{T,Prefix} -> Matrix{T} or Vec{T} -> Vector{T} (depending on the type)
 - SOL_feasibility: NamedTuple with PETSc types -> NamedTuple with native types
 - SOL_main: NamedTuple with PETSc types -> NamedTuple with native types
 - geometry: Geometry with PETSc types -> Geometry with native types

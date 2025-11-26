@@ -59,7 +59,7 @@ if rank == 0
     flush(stdout)
 end
 
-v_finite = SafePETSc.Vec_uniform([1.0, 2.0, 3.0]; Prefix=MPIDENSE)
+v_finite = SafePETSc.Vec_uniform([1.0, 2.0, 3.0])
 @test MultiGridBarrierPETSc.amgb_all_isfinite(v_finite) == true
 
 SafePETSc.SafeMPI.check_and_destroy!()
@@ -71,7 +71,7 @@ if rank == 0
     flush(stdout)
 end
 
-v_inf = SafePETSc.Vec_uniform([1.0, Inf, 3.0]; Prefix=MPIDENSE)
+v_inf = SafePETSc.Vec_uniform([1.0, Inf, 3.0])
 @test MultiGridBarrierPETSc.amgb_all_isfinite(v_inf) == false
 
 SafePETSc.SafeMPI.check_and_destroy!()
@@ -99,7 +99,7 @@ if rank == 0
 end
 
 A_proto = SafePETSc.Mat_uniform(spzeros(10, 10); Prefix=MPIAIJ)
-v = SafePETSc.Vec_uniform([1.0, 2.0, 3.0]; Prefix=MPIDENSE)
+v = SafePETSc.Vec_uniform([1.0, 2.0, 3.0])
 D = MultiGridBarrierPETSc.amgb_diag(A_proto, v)
 @test D isa SafePETSc.Mat
 @test size(D) == (3, 3)
@@ -156,7 +156,7 @@ if rank == 0
     flush(stdout)
 end
 
-v = SafePETSc.Vec_uniform([5.0, 2.0, 8.0, 1.0]; Prefix=MPIDENSE)
+v = SafePETSc.Vec_uniform([5.0, 2.0, 8.0, 1.0])
 min_val = minimum(v)
 @test min_val == 1.0
 
@@ -169,7 +169,7 @@ if rank == 0
     flush(stdout)
 end
 
-v = SafePETSc.Vec_uniform([5.0, 2.0, 8.0, 1.0]; Prefix=MPIDENSE)
+v = SafePETSc.Vec_uniform([5.0, 2.0, 8.0, 1.0])
 max_val = maximum(v)
 @test max_val == 8.0
 
