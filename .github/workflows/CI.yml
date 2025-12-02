@@ -37,7 +37,7 @@ jobs:
         version:
           - '1.10'
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
         arch:
           - x64
     steps:
@@ -53,9 +53,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
-          key: petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-${{ hashFiles('.github/workflows/CI.yml') }}
+          key: petsc-${{ env.PETSC_VERSION }}-ubuntu-24.04-${{ hashFiles('.github/workflows/CI.yml') }}
           restore-keys: |
-            petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-
+            petsc-${{ env.PETSC_VERSION }}-ubuntu-24.04-
 
       - name: Install PETSc build dependencies
         if: steps.cache-petsc.outputs.cache-hit != 'true'
@@ -130,7 +130,7 @@ jobs:
 
   docs:
     name: Documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       actions: write
       contents: write
@@ -153,9 +153,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
-          key: petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-${{ hashFiles('.github/workflows/CI.yml') }}
+          key: petsc-${{ env.PETSC_VERSION }}-ubuntu-24.04-${{ hashFiles('.github/workflows/CI.yml') }}
           restore-keys: |
-            petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-
+            petsc-${{ env.PETSC_VERSION }}-ubuntu-24.04-
 
       - name: Install PETSc build dependencies
         if: steps.cache-petsc.outputs.cache-hit != 'true'
