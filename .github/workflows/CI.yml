@@ -48,12 +48,48 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopenmpi-dev
 
-      - name: Download prebuilt PETSc with MUMPS
+      - name: Cache PETSc installation
+        id: cache-petsc
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
+          key: petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-${{ hashFiles('.github/workflows/CI.yml') }}
+          restore-keys: |
+            petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-
+
+      - name: Install PETSc build dependencies
+        if: steps.cache-petsc.outputs.cache-hit != 'true'
         run: |
-          wget -q https://github.com/${{ github.repository }}/releases/download/petsc-v${{ env.PETSC_VERSION }}-ubuntu-latest/petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
-          tar -xzf petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz -C $RUNNER_TEMP
-          rm petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
-          echo "✓ PETSc ${{ env.PETSC_VERSION }} with MUMPS ready"
+          sudo apt-get install -y gfortran make git
+
+      - name: Build PETSc with MUMPS
+        if: steps.cache-petsc.outputs.cache-hit != 'true'
+        run: |
+          cd $RUNNER_TEMP
+          git clone --depth 1 --branch v${PETSC_VERSION} https://gitlab.com/petsc/petsc.git petsc-src
+          cd petsc-src
+          ./configure \
+            --prefix=$RUNNER_TEMP/petsc-${PETSC_VERSION} \
+            --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \
+            --with-debugging=0 \
+            --download-fblaslapack=1 \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --download-scalapack=1 \
+            --download-ptscotch=1 \
+            --download-mumps=1 \
+            --with-hdf5=0 \
+            --with-curl=0 \
+            --with-x=0 \
+            --with-shared-libraries=1
+          make all -j$(nproc)
+          make install
+          cd $RUNNER_TEMP && rm -rf petsc-src
+
+      - name: Verify PETSc installation
+        run: |
+          test -f $RUNNER_TEMP/petsc-${PETSC_VERSION}/lib/libpetsc.so
+          echo "PETSc ${PETSC_VERSION} with MUMPS ready"
 
       - uses: actions/setup-python@v6
         with:
@@ -112,12 +148,48 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopenmpi-dev
 
-      - name: Download prebuilt PETSc with MUMPS
+      - name: Cache PETSc installation
+        id: cache-petsc
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/petsc-${{ env.PETSC_VERSION }}
+          key: petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-${{ hashFiles('.github/workflows/CI.yml') }}
+          restore-keys: |
+            petsc-${{ env.PETSC_VERSION }}-ubuntu-latest-
+
+      - name: Install PETSc build dependencies
+        if: steps.cache-petsc.outputs.cache-hit != 'true'
         run: |
-          wget -q https://github.com/${{ github.repository }}/releases/download/petsc-v${{ env.PETSC_VERSION }}-ubuntu-latest/petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
-          tar -xzf petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz -C $RUNNER_TEMP
-          rm petsc-${{ env.PETSC_VERSION }}-ubuntu-latest.tar.gz
-          echo "✓ PETSc ${{ env.PETSC_VERSION }} with MUMPS ready"
+          sudo apt-get install -y gfortran make git
+
+      - name: Build PETSc with MUMPS
+        if: steps.cache-petsc.outputs.cache-hit != 'true'
+        run: |
+          cd $RUNNER_TEMP
+          git clone --depth 1 --branch v${PETSC_VERSION} https://gitlab.com/petsc/petsc.git petsc-src
+          cd petsc-src
+          ./configure \
+            --prefix=$RUNNER_TEMP/petsc-${PETSC_VERSION} \
+            --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \
+            --with-debugging=0 \
+            --download-fblaslapack=1 \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --download-scalapack=1 \
+            --download-ptscotch=1 \
+            --download-mumps=1 \
+            --with-hdf5=0 \
+            --with-curl=0 \
+            --with-x=0 \
+            --with-shared-libraries=1
+          make all -j$(nproc)
+          make install
+          cd $RUNNER_TEMP && rm -rf petsc-src
+
+      - name: Verify PETSc installation
+        run: |
+          test -f $RUNNER_TEMP/petsc-${PETSC_VERSION}/lib/libpetsc.so
+          echo "PETSc ${PETSC_VERSION} with MUMPS ready"
 
       - uses: actions/setup-python@v6
         with:
