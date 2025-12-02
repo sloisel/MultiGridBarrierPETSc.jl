@@ -331,7 +331,7 @@ println(io0(), "Relative difference: ", diff)
 
 ## 3D Problems
 
-MultiGridBarrierPETSc also supports 3D hexahedral finite elements through MultiGridBarrier3d.jl.
+MultiGridBarrierPETSc also supports 3D hexahedral finite elements through MultiGridBarrier.jl.
 
 ### Basic 3D Example
 
@@ -386,7 +386,7 @@ The `fem3d_petsc` and `fem3d_petsc_solve` functions accept:
 
 ```julia
 using MultiGridBarrierPETSc
-using MultiGridBarrier3d
+using MultiGridBarrier
 using LinearAlgebra
 using SafePETSc  # For io0()
 MultiGridBarrierPETSc.Init()
@@ -396,7 +396,7 @@ sol_petsc = fem3d_petsc_solve(Float64; L=2, k=2, p=1.0, verbose=false)
 z_petsc = petsc_to_native(sol_petsc).z
 
 # Solve with native (sequential)
-sol_native = MultiGridBarrier3d.fem3d_solve(Float64; L=2, k=2, p=1.0, verbose=false)
+sol_native = MultiGridBarrier.fem3d_solve(Float64; L=2, k=2, p=1.0, verbose=false)
 z_native = sol_native.z
 
 # Compare solutions
@@ -408,5 +408,4 @@ println(io0(), "Relative difference: ", diff)
 
 - See the [API Reference](@ref) for detailed function documentation
 - Check the `examples/` directory for complete runnable examples
-- Consult MultiGridBarrier.jl documentation for barrier method theory
-- Consult MultiGridBarrier3d.jl documentation for 3D FEM details
+- Consult MultiGridBarrier.jl documentation for barrier method theory and 3D FEM details

@@ -74,8 +74,7 @@ Depth = 2
 
 This package is part of a larger ecosystem:
 
-- **[MultiGridBarrier.jl](https://github.com/sloisel/MultiGridBarrier.jl)**: Core multigrid barrier method implementation (2D)
-- **[MultiGridBarrier3d.jl](https://github.com/sloisel/MultiGridBarrier3d.jl)**: 3D hexahedral finite element extension
+- **[MultiGridBarrier.jl](https://github.com/sloisel/MultiGridBarrier.jl)**: Core multigrid barrier method implementation (1D, 2D, and 3D)
 - **[SafePETSc.jl](https://github.com/sloisel/SafePETSc.jl)**: Safe PETSc bindings with automatic memory management
 - **MPI.jl**: Julia MPI bindings for distributed computing
 

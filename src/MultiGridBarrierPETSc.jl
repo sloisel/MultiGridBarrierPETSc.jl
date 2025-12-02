@@ -44,9 +44,7 @@ using SafePETSc: MPIDENSE, MPIAIJ
 using LinearAlgebra
 using SparseArrays
 using MultiGridBarrier
-using MultiGridBarrier: Geometry, AMGBSOL, fem1d, FEM1D
-using MultiGridBarrier3d
-using MultiGridBarrier3d: fem3d, FEM3D
+using MultiGridBarrier: Geometry, AMGBSOL, fem1d, FEM1D, fem3d, FEM3D
 
 # ============================================================================
 # MultiGridBarrier API Implementation for SafePETSc Types

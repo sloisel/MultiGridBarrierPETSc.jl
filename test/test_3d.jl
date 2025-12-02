@@ -8,7 +8,6 @@ MultiGridBarrierPETSc.Init()
 # Now load dependencies for tests
 using SafePETSc
 using MultiGridBarrier
-using MultiGridBarrier3d
 using LinearAlgebra
 include(joinpath(@__DIR__, "mpi_test_harness.jl"))
 using .MPITestHarness: QuietTestSet
@@ -35,7 +34,7 @@ for L in 1:2
     sol_petsc = MultiGridBarrierPETSc.fem3d_petsc_solve(Float64; L=L, k=2, p=1.0, verbose=false)
 
     # Solve with native Julia types (sequential)
-    sol_native = MultiGridBarrier3d.fem3d_solve(Float64; L=L, k=2, p=1.0, verbose=false)
+    sol_native = MultiGridBarrier.fem3d_solve(Float64; L=L, k=2, p=1.0, verbose=false)
 
     # Convert PETSc solution to native for comparison
     z_petsc = Matrix(sol_petsc.z)
