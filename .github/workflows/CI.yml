@@ -106,6 +106,10 @@ jobs:
 
       - uses: julia-actions/cache@v2
 
+      - name: Pin OpenSSL_jll to avoid version mismatch
+        run: |
+          julia --project -e 'using Pkg; Pkg.add(name="OpenSSL_jll", version="3.0")'
+
       - name: Configure MPI.jl and PETSc.jl to use custom PETSc build
         run: |
           julia --project -e 'using Pkg; Pkg.add("MPIPreferences"); using MPIPreferences; MPIPreferences.use_system_binary()'
@@ -204,6 +208,10 @@ jobs:
           version: '1.11'
 
       - uses: julia-actions/cache@v2
+
+      - name: Pin OpenSSL_jll to avoid version mismatch
+        run: |
+          julia --project -e 'using Pkg; Pkg.add(name="OpenSSL_jll", version="3.0")'
 
       - name: Configure MPI.jl and PETSc.jl to use custom PETSc build
         run: |
