@@ -404,6 +404,93 @@ diff = norm(z_petsc - z_native) / norm(z_native)
 println(io0(), "Relative difference: ", diff)
 ```
 
+## Time-Dependent (Parabolic) Problems
+
+MultiGridBarrierPETSc supports time-dependent parabolic PDEs through MultiGridBarrier.jl's `parabolic_solve` function. This solves p-Laplace heat equations using implicit Euler timestepping.
+
+### Basic Parabolic Example
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier
+using SafePETSc  # For io0()
+MultiGridBarrierPETSc.Init()
+
+# Create PETSc geometry
+g = fem2d_petsc(Float64; L=2)
+
+# Solve time-dependent problem from t=0 to t=1 with timestep h=0.2
+sol = parabolic_solve(g; h=0.2, p=1.0, verbose=true)
+
+println(io0(), "Parabolic solve completed!")
+println(io0(), "Number of timesteps: ", length(sol.ts))
+println(io0(), "Time points: ", sol.ts)
+```
+
+### Parabolic Parameters
+
+The `parabolic_solve` function accepts:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `h` | Time step size | 0.2 |
+| `t0` | Initial time | 0.0 |
+| `t1` | Final time | 1.0 |
+| `ts` | Custom time grid (overrides t0, t1, h) | `t0:h:t1` |
+| `p` | Exponent for p-Laplacian | 1.0 |
+| `f1` | Source term function `(t, x) -> T` | `(t,x) -> 0.5` |
+| `g` | Initial/boundary condition `(t, x) -> Vector{T}` | Dimension-dependent |
+| `verbose` | Print progress bar | true |
+
+### 1D Parabolic Problem
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier
+using SafePETSc
+MultiGridBarrierPETSc.Init()
+
+# Create 1D PETSc geometry
+g = fem1d_petsc(Float64; L=4)
+
+# Solve parabolic problem with finer timesteps
+sol = parabolic_solve(g; h=0.1, t1=2.0, p=1.5, verbose=true)
+
+println(io0(), "Solution has ", length(sol.u), " time snapshots")
+```
+
+### Accessing Parabolic Solutions
+
+The `ParabolicSOL` structure contains:
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier
+using SafePETSc
+MultiGridBarrierPETSc.Init()
+
+g = fem2d_petsc(Float64; L=2)
+sol = parabolic_solve(g; h=0.25, p=1.0, verbose=false)
+
+# Access solution components
+println(io0(), "Geometry type: ", typeof(sol.geometry))
+println(io0(), "Time points: ", sol.ts)
+println(io0(), "Number of snapshots: ", length(sol.u))
+
+# Each sol.u[k] is a Mat containing the solution at time ts[k]
+# Rows are mesh nodes, columns are solution components
+```
+
+### Mathematical Background
+
+The parabolic solver solves the p-Laplace heat equation:
+
+```math
+u_t - \nabla \cdot (\|\nabla u\|_2^{p-2}\nabla u) = -f_1
+```
+
+using implicit Euler timestepping. At each time step, it solves an optimization problem via the barrier method, making it naturally compatible with PETSc's distributed linear algebra.
+
 ## Next Steps
 
 - See the [API Reference](@ref) for detailed function documentation

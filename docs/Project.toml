@@ -4,3 +4,6 @@ DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
 MultiGridBarrier = "9e2c1f1d-9131-4ad4-b32f-bd2a0b0ecd1e"
 MultiGridBarrierPETSc = "25e6f22c-346c-4a8d-b463-5e1d66a49b87"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+
+[sources]
+MultiGridBarrierPETSc = {path = "/Users/sebastienloisel/Library/CloudStorage/Dropbox/2023/Spectral Barrier Method/julia/MultiGridBarrierPETSc.jl"}
