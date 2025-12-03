@@ -44,7 +44,7 @@ using SafePETSc: MPIDENSE, MPIAIJ
 using LinearAlgebra
 using SparseArrays
 using MultiGridBarrier
-using MultiGridBarrier: Geometry, AMGBSOL, fem1d, FEM1D, fem3d, FEM3D
+using MultiGridBarrier: Geometry, AMGBSOL, ParabolicSOL, fem1d, FEM1D, fem3d, FEM3D
 
 # ============================================================================
 # MultiGridBarrier API Implementation for SafePETSc Types
@@ -315,6 +315,46 @@ function petsc_to_native(sol_petsc::AMGBSOL{T, XType, WType, MType, Discretizati
         SOL_main_native,
         sol_petsc.log,
         geometry_native
+    )
+end
+
+"""
+    petsc_to_native(sol_petsc::ParabolicSOL{T, XType, WType, MType, Discretization}) where {T, XType, WType, MType, Discretization}
+
+**Collective**
+
+Convert a ParabolicSOL solution object from PETSc types back to native Julia types.
+
+This is a collective operation that performs a deep conversion of the parabolic solution:
+- geometry: Geometry with PETSc types -> Geometry with native types
+- ts: Vector{T} (unchanged, already native)
+- u: Vector{Mat{T,Prefix}} -> Vector{Matrix{T}} (each time snapshot converted)
+
+# Example
+```julia
+g = fem2d_petsc(Float64; L=2)
+sol_petsc = parabolic_solve(g; h=0.5, p=1.0)
+sol_native = petsc_to_native(sol_petsc)
+```
+"""
+function petsc_to_native(sol_petsc::ParabolicSOL{T, XType, WType, MType, Discretization}) where {T, XType, WType, MType, Discretization}
+    # Convert the geometry
+    geometry_native = petsc_to_native(sol_petsc.geometry)
+
+    # ts is already Vector{T}, no conversion needed
+    ts_native = sol_petsc.ts
+
+    # Convert each time snapshot in u from Mat to Matrix
+    u_native = [SafePETSc.J(u_k) for u_k in sol_petsc.u]
+
+    # Determine native X type from converted u
+    XTypeNative = typeof(u_native[1])
+
+    # Create and return the native ParabolicSOL
+    return ParabolicSOL{T, XTypeNative, Vector{T}, SparseMatrixCSC{T,Int}, Discretization}(
+        geometry_native,
+        ts_native,
+        u_native
     )
 end
 

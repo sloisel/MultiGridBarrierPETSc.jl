@@ -85,6 +85,36 @@ end
 SafePETSc.SafeMPI.check_and_destroy!()
 MPI.Barrier(comm)
 
+# Test petsc_to_native for ParabolicSOL
+if rank == 0
+    println("[DEBUG] Test petsc_to_native for ParabolicSOL")
+    flush(stdout)
+end
+
+g_petsc = fem2d_petsc(Float64; L=1)
+sol_petsc = parabolic_solve(g_petsc; h=0.5, p=1.0, verbose=false)
+sol_native = petsc_to_native(sol_petsc)
+
+# Check that the conversion produced native types
+@test sol_native isa MultiGridBarrier.ParabolicSOL
+@test sol_native.geometry isa MultiGridBarrier.Geometry
+@test sol_native.ts isa Vector{Float64}
+@test sol_native.u isa Vector
+@test all(u_k isa Matrix{Float64} for u_k in sol_native.u)
+
+# Check dimensions are preserved
+@test length(sol_native.ts) == length(sol_petsc.ts)
+@test length(sol_native.u) == length(sol_petsc.u)
+@test size(sol_native.u[1]) == size(Matrix(sol_petsc.u[1]))
+
+if rank == 0
+    println("[DEBUG]   petsc_to_native: converted $(length(sol_native.u)) snapshots")
+    flush(stdout)
+end
+
+SafePETSc.SafeMPI.check_and_destroy!()
+MPI.Barrier(comm)
+
 if rank == 0
     println("[DEBUG] All parabolic tests completed")
     flush(stdout)

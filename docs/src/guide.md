@@ -481,6 +481,28 @@ println(io0(), "Number of snapshots: ", length(sol.u))
 # Rows are mesh nodes, columns are solution components
 ```
 
+### Converting Parabolic Solutions to Native Types
+
+Use `petsc_to_native` to convert parabolic solutions back to native Julia types for analysis or plotting:
+
+```julia
+using MultiGridBarrierPETSc
+using MultiGridBarrier
+using SafePETSc
+MultiGridBarrierPETSc.Init()
+
+g = fem2d_petsc(Float64; L=2)
+sol_petsc = parabolic_solve(g; h=0.25, p=1.0, verbose=false)
+
+# Convert to native types
+sol_native = petsc_to_native(sol_petsc)
+
+# Now sol_native.u contains Vector{Matrix{Float64}}
+# and sol_native.geometry contains native arrays
+println(io0(), "Native u type: ", typeof(sol_native.u))
+println(io0(), "Snapshot size: ", size(sol_native.u[1]))
+```
+
 ### Mathematical Background
 
 The parabolic solver solves the p-Laplace heat equation:
