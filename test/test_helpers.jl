@@ -77,24 +77,9 @@ v_inf = SafePETSc.Vec_uniform([1.0, Inf, 3.0])
 SafePETSc.SafeMPI.check_and_destroy!()
 MPI.Barrier(comm)
 
-# Test 5: amgb_hcat for horizontal concatenation
+# Test 5: amgb_diag with Vec
 if rank == 0
-    println("[DEBUG] Test 5: amgb_hcat for horizontal concatenation")
-    flush(stdout)
-end
-
-A = SafePETSc.Mat_uniform(sparse([1.0 2.0; 3.0 4.0]); Prefix=MPIAIJ)
-B = SafePETSc.Mat_uniform(sparse([5.0 6.0; 7.0 8.0]); Prefix=MPIAIJ)
-C = MultiGridBarrierPETSc.amgb_hcat(A, B)
-@test C isa SafePETSc.Mat
-@test size(C) == (2, 4)
-
-SafePETSc.SafeMPI.check_and_destroy!()
-MPI.Barrier(comm)
-
-# Test 6: amgb_diag with Vec
-if rank == 0
-    println("[DEBUG] Test 6: amgb_diag with Vec")
+    println("[DEBUG] Test 5: amgb_diag with Vec")
     flush(stdout)
 end
 
@@ -107,9 +92,9 @@ D = MultiGridBarrierPETSc.amgb_diag(A_proto, v)
 SafePETSc.SafeMPI.check_and_destroy!()
 MPI.Barrier(comm)
 
-# Test 7: amgb_diag with Vector
+# Test 6: amgb_diag with Vector
 if rank == 0
-    println("[DEBUG] Test 7: amgb_diag with Vector")
+    println("[DEBUG] Test 6: amgb_diag with Vector")
     flush(stdout)
 end
 
@@ -122,9 +107,9 @@ D = MultiGridBarrierPETSc.amgb_diag(A_proto, v_native)
 SafePETSc.SafeMPI.check_and_destroy!()
 MPI.Barrier(comm)
 
-# Test 8: amgb_blockdiag
+# Test 7: amgb_blockdiag
 if rank == 0
-    println("[DEBUG] Test 8: amgb_blockdiag for block diagonal construction")
+    println("[DEBUG] Test 7: amgb_blockdiag for block diagonal construction")
     flush(stdout)
 end
 
@@ -137,9 +122,9 @@ C = MultiGridBarrierPETSc.amgb_blockdiag(A, B)
 SafePETSc.SafeMPI.check_and_destroy!()
 MPI.Barrier(comm)
 
-# Test 9: map_rows
+# Test 8: map_rows
 if rank == 0
-    println("[DEBUG] Test 9: map_rows for row-wise operations")
+    println("[DEBUG] Test 8: map_rows for row-wise operations")
     flush(stdout)
 end
 
@@ -150,9 +135,9 @@ result = MultiGridBarrierPETSc.map_rows(row -> sum(row), x)
 SafePETSc.SafeMPI.check_and_destroy!()
 MPI.Barrier(comm)
 
-# Test 10: Base.minimum for Vec
+# Test 9: Base.minimum for Vec
 if rank == 0
-    println("[DEBUG] Test 10: Base.minimum for Vec")
+    println("[DEBUG] Test 9: Base.minimum for Vec")
     flush(stdout)
 end
 
@@ -163,9 +148,9 @@ min_val = minimum(v)
 SafePETSc.SafeMPI.check_and_destroy!()
 MPI.Barrier(comm)
 
-# Test 11: Base.maximum for Vec
+# Test 10: Base.maximum for Vec
 if rank == 0
-    println("[DEBUG] Test 11: Base.maximum for Vec")
+    println("[DEBUG] Test 10: Base.maximum for Vec")
     flush(stdout)
 end
 

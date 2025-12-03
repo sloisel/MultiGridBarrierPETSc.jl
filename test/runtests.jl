@@ -35,4 +35,8 @@ end
     @testset "1D integration test" begin
         run_mpi_test("test_1d.jl")
     end
+
+    @testset "Parabolic integration test" begin
+        run_mpi_test("test_parabolic.jl")
+    end
 end

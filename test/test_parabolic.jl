@@ -1,96 +1,124 @@
-#!/usr/bin/env julia
-# Test script to see if parabolic_solve works with PETSc types
-
-using SafePETSc
-SafePETSc.Init()
-using SafePETSc: io0
-
+using Test
 using MPI
-using MultiGridBarrierPETSc
-using MultiGridBarrier
 
+# Use MultiGridBarrierPETSc initializer (MPI then PETSc)
+using MultiGridBarrierPETSc
 MultiGridBarrierPETSc.Init()
 
+# Now load dependencies for tests
+using SafePETSc
+using MultiGridBarrier
+using LinearAlgebra
+include(joinpath(@__DIR__, "mpi_test_harness.jl"))
+using .MPITestHarness: QuietTestSet
+
 comm = MPI.COMM_WORLD
+rank = MPI.Comm_rank(comm)
+nranks = MPI.Comm_size(comm)
 
-println(io0(), "\n", "="^60)
-println(io0(), "Testing parabolic_solve with PETSc types")
-println(io0(), "="^60, "\n")
-
-# First, let's verify that static fem1d_petsc_solve works
-println(io0(), "[TEST 1] Testing static fem1d_petsc_solve (sanity check)...")
-
-try
-    sol_static = fem1d_petsc_solve(Float64; L=2, p=1.0, verbose=false)
-    println(io0(), "[OK] Static fem1d_petsc_solve works!")
-    println(io0(), "     Solution size: ", size(sol_static.z))
-catch e
-    println(io0(), "[FAIL] Static fem1d_petsc_solve failed:")
-    showerror(io0(), e, catch_backtrace())
+if rank == 0
+    println("[DEBUG] Parabolic integration test starting")
+    flush(stdout)
 end
 
-MPI.Barrier(comm)
+# Keep output tidy and aggregate at the end
+ts = @testset QuietTestSet "Parabolic integration tests" begin
 
-# Now let's try parabolic_solve with a PETSc geometry
-println(io0(), "\n[TEST 2] Testing parabolic_solve with PETSc geometry...")
-
-try
-    # Create a PETSc-based 1D geometry
-    g_petsc = fem1d_petsc(Float64; L=2)
-
-    println(io0(), "     Created PETSc geometry")
-    println(io0(), "     x type: ", typeof(g_petsc.x))
-    println(io0(), "     w type: ", typeof(g_petsc.w))
-
-    # Try calling parabolic_solve
-    sol_parabolic = parabolic_solve(g_petsc; h=0.5, p=1.0, verbose=false)
-
-    println(io0(), "[OK] parabolic_solve with PETSc geometry works!")
-    println(io0(), "     Solution type: ", typeof(sol_parabolic))
-    println(io0(), "     u size: ", size(sol_parabolic.u))
-catch e
-    println(io0(), "[FAIL] parabolic_solve with PETSc geometry failed:")
-    showerror(io0(), e)
-    println(io0(), "\n\nFull stacktrace:")
-    for (exc, bt) in current_exceptions()
-        showerror(io0(), exc, bt)
-        println(io0())
-    end
+# Test 1D parabolic solve with PETSc geometry
+if rank == 0
+    println("[DEBUG] Test 1D parabolic solve with PETSc geometry")
+    flush(stdout)
 end
 
-MPI.Barrier(comm)
+g_petsc_1d = fem1d_petsc(Float64; L=2)
+sol_parabolic_1d = parabolic_solve(g_petsc_1d; h=0.5, p=1.0, verbose=false)
 
-# Also try 2D case
-println(io0(), "\n[TEST 3] Testing parabolic_solve with 2D PETSc geometry...")
+@test length(sol_parabolic_1d.ts) == 3  # t=0, 0.5, 1.0
+@test length(sol_parabolic_1d.u) == 3
 
-try
-    # Create a PETSc-based 2D geometry (small for quick test)
-    g_petsc_2d = fem2d_petsc(Float64; L=1)
-
-    println(io0(), "     Created 2D PETSc geometry")
-
-    # Try calling parabolic_solve
-    sol_parabolic_2d = parabolic_solve(g_petsc_2d; h=0.5, p=1.0, verbose=false)
-
-    println(io0(), "[OK] parabolic_solve with 2D PETSc geometry works!")
-    println(io0(), "     u size: ", size(sol_parabolic_2d.u))
-catch e
-    println(io0(), "[FAIL] parabolic_solve with 2D PETSc geometry failed:")
-    showerror(io0(), e)
-    println(io0(), "\n\nFull stacktrace:")
-    for (exc, bt) in current_exceptions()
-        showerror(io0(), exc, bt)
-        println(io0())
-    end
+if rank == 0
+    println("[DEBUG]   1D parabolic: $(length(sol_parabolic_1d.ts)) timesteps")
+    flush(stdout)
 end
 
-MPI.Barrier(comm)
-
-println(io0(), "\n", "="^60)
-println(io0(), "Test completed")
-println(io0(), "="^60, "\n")
-
-# Clean up PETSc objects
 SafePETSc.SafeMPI.check_and_destroy!()
+MPI.Barrier(comm)
+
+# Test 2D parabolic solve with PETSc geometry
+if rank == 0
+    println("[DEBUG] Test 2D parabolic solve with PETSc geometry")
+    flush(stdout)
+end
+
+g_petsc_2d = fem2d_petsc(Float64; L=1)
+sol_parabolic_2d = parabolic_solve(g_petsc_2d; h=0.5, p=1.0, verbose=false)
+
+@test length(sol_parabolic_2d.ts) == 3  # t=0, 0.5, 1.0
+@test length(sol_parabolic_2d.u) == 3
+
+if rank == 0
+    println("[DEBUG]   2D parabolic: $(length(sol_parabolic_2d.ts)) timesteps")
+    flush(stdout)
+end
+
+SafePETSc.SafeMPI.check_and_destroy!()
+MPI.Barrier(comm)
+
+# Test parabolic solve with custom time parameters
+if rank == 0
+    println("[DEBUG] Test parabolic solve with custom time parameters")
+    flush(stdout)
+end
+
+g_petsc = fem1d_petsc(Float64; L=2)
+sol_custom = parabolic_solve(g_petsc; h=0.25, t0=0.0, t1=1.0, p=1.0, verbose=false)
+
+@test length(sol_custom.ts) == 5  # t=0, 0.25, 0.5, 0.75, 1.0
+@test sol_custom.ts[1] ≈ 0.0
+@test sol_custom.ts[end] ≈ 1.0
+
+if rank == 0
+    println("[DEBUG]   Custom params: $(length(sol_custom.ts)) timesteps")
+    flush(stdout)
+end
+
+SafePETSc.SafeMPI.check_and_destroy!()
+MPI.Barrier(comm)
+
+if rank == 0
+    println("[DEBUG] All parabolic tests completed")
+    flush(stdout)
+end
+
+end  # End of QuietTestSet
+
+# Aggregate per-rank counts and print a single summary on root
+local_counts = [
+    get(ts.counts, :pass, 0),
+    get(ts.counts, :fail, 0),
+    get(ts.counts, :error, 0),
+    get(ts.counts, :broken, 0),
+    get(ts.counts, :skip, 0),
+]
+
+global_counts = similar(local_counts)
+MPI.Allreduce!(local_counts, global_counts, +, comm)
+
+if rank == 0
+    println("Test Summary: Parabolic integration tests (aggregated across $(nranks) ranks)")
+    println("  Pass: $(global_counts[1])  Fail: $(global_counts[2])  Error: $(global_counts[3])  Broken: $(global_counts[4])  Skip: $(global_counts[5])")
+end
 
 MPI.Barrier(comm)
+
+if global_counts[2] > 0 || global_counts[3] > 0
+    Base.exit(1)
+end
+
+# Ensure all ranks reach this point before deciding outcome
+MPI.Barrier(comm)
+
+if rank == 0
+    println("[DEBUG] Parabolic integration test file completed successfully")
+    flush(stdout)
+end

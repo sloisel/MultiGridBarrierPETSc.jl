@@ -51,7 +51,7 @@ using MultiGridBarrier: Geometry, AMGBSOL, fem1d, FEM1D, fem3d, FEM3D
 # ============================================================================
 
 # Import the functions we need to extend
-import MultiGridBarrier: amgb_zeros, amgb_all_isfinite, amgb_hcat, amgb_diag, amgb_blockdiag, map_rows
+import MultiGridBarrier: amgb_zeros, amgb_all_isfinite, amgb_diag, amgb_blockdiag, map_rows
 
 # amgb_zeros: Create zero matrices with appropriate type
 MultiGridBarrier.amgb_zeros(::Mat{T, MPIAIJ}, m, n) where {T} = Mat_uniform(spzeros(T, m, n); Prefix=MPIAIJ)
@@ -61,10 +61,6 @@ MultiGridBarrier.amgb_zeros(::LinearAlgebra.Adjoint{T, <:Mat{T, MPIDENSE}}, m, n
 
 # amgb_all_isfinite: Check if all elements are finite
 MultiGridBarrier.amgb_all_isfinite(z::Vec{T}) where {T} = all(isfinite.(Vector(z)))
-
-# amgb_hcat: Horizontal concatenation
-# Just use the built-in hcat - it handles partitions correctly
-MultiGridBarrier.amgb_hcat(A::Mat...) = hcat(A...)
 
 # amgb_diag: Create diagonal matrix from vector
 MultiGridBarrier.amgb_diag(::Mat{T, MPIAIJ}, z::Vec{T}, m=length(z), n=length(z)) where {T} =
