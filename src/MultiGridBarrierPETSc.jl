@@ -83,18 +83,6 @@ function MultiGridBarrier.map_rows(f, A::Union{Vec{T}, Mat{T}, LinearAlgebra.Adj
     return SafePETSc.map_rows(f, materialized...)
 end
 
-# Additional base functions needed for MultiGridBarrier
-# These must compute GLOBAL min/max across all ranks using MPI reductions
-function Base.minimum(v::Vec{T}) where {T}
-    local_min = minimum(SafePETSc.PETSc.unsafe_localarray(v.obj.v; read=true))
-    return MPI.Allreduce(local_min, MPI.MIN, MPI.COMM_WORLD)
-end
-
-function Base.maximum(v::Vec{T}) where {T}
-    local_max = maximum(SafePETSc.PETSc.unsafe_localarray(v.obj.v; read=true))
-    return MPI.Allreduce(local_max, MPI.MAX, MPI.COMM_WORLD)
-end
-
 # ============================================================================
 # Type Conversion
 # ============================================================================
