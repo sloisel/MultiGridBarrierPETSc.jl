@@ -51,13 +51,15 @@ using MultiGridBarrier: Geometry, AMGBSOL, ParabolicSOL, fem1d, FEM1D, fem3d, FE
 # ============================================================================
 
 # Import the functions we need to extend
-import MultiGridBarrier: amgb_zeros, amgb_all_isfinite, amgb_diag, amgb_blockdiag, map_rows
+import MultiGridBarrier: amgb_zeros, amgb_all_isfinite, amgb_diag, amgb_blockdiag, map_rows, symmetric
 
-# amgb_zeros: Create zero matrices with appropriate type
+# amgb_zeros: Create zero matrices/vectors with appropriate type
 MultiGridBarrier.amgb_zeros(::Mat{T, MPIAIJ}, m, n) where {T} = Mat_uniform(spzeros(T, m, n); Prefix=MPIAIJ)
 MultiGridBarrier.amgb_zeros(::LinearAlgebra.Adjoint{T, <:Mat{T, MPIAIJ}}, m, n) where {T} = Mat_uniform(spzeros(T, m, n); Prefix=MPIAIJ)
 MultiGridBarrier.amgb_zeros(::Mat{T, MPIDENSE}, m, n) where {T} = Mat_uniform(zeros(T, m, n); Prefix=MPIDENSE)
 MultiGridBarrier.amgb_zeros(::LinearAlgebra.Adjoint{T, <:Mat{T, MPIDENSE}}, m, n) where {T} = Mat_uniform(zeros(T, m, n); Prefix=MPIDENSE)
+# Type-based variants for Vec
+MultiGridBarrier.amgb_zeros(::Type{Vec{T}}, n) where {T} = Vec_uniform(zeros(T, n))
 
 # amgb_all_isfinite: Check if all elements are finite
 MultiGridBarrier.amgb_all_isfinite(z::Vec{T}) where {T} = all(isfinite.(Vector(z)))
@@ -82,6 +84,9 @@ function MultiGridBarrier.map_rows(f, A::Union{Vec{T}, Mat{T}, LinearAlgebra.Adj
     materialized = [a isa LinearAlgebra.Adjoint ? Mat(a) : a for a in A]
     return SafePETSc.map_rows(f, materialized...)
 end
+
+# symmetric: PETSc solvers handle symmetry internally, so just return the matrix as-is
+MultiGridBarrier.symmetric(A::Mat{T}) where {T} = A
 
 # ============================================================================
 # Type Conversion
