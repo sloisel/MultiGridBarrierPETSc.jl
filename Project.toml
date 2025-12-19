@@ -9,13 +9,9 @@ MultiGridBarrier = "9e2c1f1d-9131-4ad4-b32f-bd2a0b0ecd1e"
 SafePETSc = "50acdc01-ce88-4ca7-bd87-6916c254362e"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
-[sources]
-MultiGridBarrier = {path = "/Users/sebastienloisel/Dropbox/2023/Spectral Barrier Method/julia/MultiGridBarrier.jl"}
-SafePETSc = {path = "/Users/sebastienloisel/Dropbox/2023/Spectral Barrier Method/julia/SafePETSc.jl"}
-
 [compat]
 MPI = "0.20.23"
-MultiGridBarrier = "0.11.32"
+MultiGridBarrier = "0.11.35"
 SafePETSc = "0.1.16"
 julia = "1.10"
 
